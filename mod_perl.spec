@@ -5,13 +5,12 @@
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.24
-Release: 6
+Version: 1.24_01
+Release: 2
 Group: System Environment/Daemons
-Source0: ftp://ftp.cpan.org/pub/CPAN/modules/by-module/Apache/%{name}-%{version}.tar.gz
-Patch0: mod_perl-1.22-rh.patch
-Patch1: mod_perl-1.24-extutils.patch
+Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 License: GPL
+URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: webserver, perl = %{perlver}
 BuildPrereq: apache-devel, perl
@@ -30,11 +29,11 @@ like for it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
-%patch0 -p1 -b .rh
-%patch1 -p1 -b .extutils
 
 %build
-perl Makefile.PL USE_APXS=1 WITH_APXS=%{_sbindir}/apxs EVERYTHING=1
+perl Makefile.PL \
+	USE_APXS=1 WITH_APXS=%{_sbindir}/apxs \
+	EVERYTHING=1 CCFLAGS="$RPM_OPT_FLAGS -fPIC"
 make
 
 # Run the test suite.
@@ -57,6 +56,10 @@ make -C faq
 rm faq/pod2htm*
 install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/html/manual/mod/mod_perl/
 
+# Remove the temporary files.
+find $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto -name "*.bs" | xargs rm
+rm   $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto/%{name}/.packlist
+
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
@@ -76,6 +79,13 @@ install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/html/manual/mod/mod_perl/
 %{_mandir}/man3/*.3*
 
 %changelog
+* Tue Feb 27 2001 Nalin Dahyabhai <nalin@redhat.com>
+- don't include .bs files
+
+* Sat Jan 20 2001 Nalin Dahyabhai <nalin@redhat.com>
+- update to 1.24_01
+- add URL
+
 * Fri Nov 17 2000 Nalin Dahyabhai <nalin@redhat.com>
 - rebuild in new environment
 
