@@ -2,8 +2,8 @@
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.99_11
-Release: 3
+Version: 1.99_12
+Release: 2.1
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
@@ -17,7 +17,7 @@ Requires: httpd >= 2.0.40, perl
 BuildPrereq: httpd-devel >= 2.0.45-14, httpd, perl, gdbm-devel
 BuildPrereq: apr-devel, apr-util-devel
 Prereq: perl
-Requires: httpd-mmn = 20020903
+Requires: httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
 %define __perl_requires %{SOURCE2}
 
@@ -116,6 +116,21 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/*/*/perllocal.pod
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Mar 02 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Fri Feb 13 2004 Chip Turner <cturner@redhat.com> 1.99_12-2
+- rebuild for update
+
+* Fri Feb 13 2004 Chip Turner <cturner@redhat.com> 1.99_12-1
+- update to 1.99_12
+
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Fri Feb  6 2004 Joe Orton <jorton@redhat.com> 1.99_11-4
+- rebuild to pick up libdb-4.2
+
 * Wed Dec  3 2003 Chip Turner <cturner@redhat.com> 1.99_11-2
 - fix the Requires: on httpd-mmn since it relied on the build box and not the build root
 
