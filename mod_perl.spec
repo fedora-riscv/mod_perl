@@ -4,7 +4,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.99_05
-Release: 1
+Release: 2
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
@@ -13,8 +13,9 @@ License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: httpd >= 2.0.40, perl >= %{perlver}
-BuildPrereq: httpd-devel >= 2.0.40, perl
+BuildPrereq: httpd-devel >= 2.0.40-6, perl
 Prereq: perl
+Requires: httpd-mmn = %(cat %{_includedir}/httpd/.mmn)
 
 %define __find_requires %{SOURCE2}
 
@@ -89,6 +90,9 @@ find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs r
 %{_mandir}/*/*.3*
 
 %changelog
+* Mon Sep  2 2002 Joe Orton <jorton@redhat.com> 1.99_05-2
+- require httpd-mmn for module ABI compatibility
+
 * Mon Aug 22 2002 Gary Benson <gbenson@redhat.com> 1.99_05_1
 - upgrade to 1.99_05
 
