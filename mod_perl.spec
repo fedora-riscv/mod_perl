@@ -3,13 +3,12 @@
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.99_04
-Release: 3
+Version: 1.99_05
+Release: 1
 Group: System Environment/Daemons
-Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
+Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
 Source2: filter-requires.sh
-Patch1: mod_perl-1.99_04-2040.patch
 License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
@@ -32,7 +31,6 @@ like for it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
-%patch1 -p1 -b .2040
 
 %build
 # Compile the module.
@@ -91,6 +89,9 @@ find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs r
 %{_mandir}/*/*.3*
 
 %changelog
+* Mon Aug 22 2002 Gary Benson <gbenson@redhat.com> 1.99_05_1
+- upgrade to 1.99_05
+
 * Mon Aug 12 2002 Gary Benson <gbenson@redhat.com> 1.99_04_3
 - rebuild against httpd-2.0.40
 
