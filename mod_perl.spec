@@ -1,20 +1,22 @@
-%define defperlver 5.6.1
-%define perlver %(rpm -q perl --queryformat '%%{version}' 2> /dev/null || echo %{defperlver})
-%define perlmajor %(echo %{perlver} | cut -f1 -d.)
+%define perlver %(rpm -q perl --queryformat '%%{version}')
 %define contentdir /var/www
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.26
-Release: 5
+Version: 1.99_04
+Release: 2
 Group: System Environment/Daemons
 Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
+Source1: perl.conf
+Source2: filter-requires.sh
 License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: webserver, perl = %{perlver}
-BuildPrereq: apache-devel, perl
+Requires: httpd, perl >= %{perlver}
+BuildPrereq: httpd-devel, perl
 Prereq: perl
+
+%define __find_requires %{SOURCE2}
 
 %description
 Mod_perl incorporates a Perl interpreter into the Apache web server,
@@ -32,55 +34,106 @@ like for it to directly incorporate a Perl interpreter.
 
 %build
 # Compile the module.
-perl Makefile.PL \
-	USE_APXS=1 WITH_APXS=%{_sbindir}/apxs PERL_USELARGEFILES=0 \
-	EVERYTHING=1 CCFLAGS="$RPM_OPT_FLAGS -fPIC"
+%{__perl} Makefile.PL </dev/null \
+	PREFIX=$RPM_BUILD_ROOT/usr INSTALLDIRS=vendor \
+	MP_APXS=%{_sbindir}/apxs \
+	CCFLAGS="$RPM_OPT_FLAGS -fPIC"
 make
 
 # Run the test suite.
+#  Need to make t/htdocs/perlio because it isn't expecting to be run as
+#  root and will fail tests that try and write files because the server
+#  will have changed it's uid.
+mkdir t/htdocs/perlio
+chmod 777 t/htdocs/perlio
 make test
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-make pure_install INSTALLDIRS=vendor PREFIX=$RPM_BUILD_ROOT%{_prefix}
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/httpd/modules
+make install MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_libdir}/httpd/modules
 
-# Install the module itself.
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/apache
-install -c -m 755 apaci/libperl.so $RPM_BUILD_ROOT%{_libdir}/apache/
+# Install the config file
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
+install -m 644 $RPM_SOURCE_DIR/perl.conf \
+   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
 
 # Install its manual.
-mkdir -p $RPM_BUILD_ROOT%{contentdir}/html/manual/mod/mod_perl
-install -c -m 644 htdocs/manual/mod/mod_perl.html \
-        $RPM_BUILD_ROOT%{contentdir}/html/manual/mod
+#mkdir -p $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl
+#install -c -m 644 htdocs/manual/mod/mod_perl.html \
+#        $RPM_BUILD_ROOT%{contentdir}/manual/mod
 
-make -C faq
-rm faq/pod2htm*
-install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/html/manual/mod/mod_perl/
+#make -C faq
+#rm faq/pod2htm*
+#install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl/
 
 # Remove the temporary files.
 find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs rm
-rm   $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto/%{name}/.packlist
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc CREDITS Changes README SUPPORT ToDo cgi_to_mod_perl.pod mod_perl.pod
-%doc mod_perl_method_handlers.pod mod_perl_traps.pod mod_perl_tuning.pod
-%doc INSTALL faq/*.html eg faq
-%doc ToDo apache-modlist.html
-%{contentdir}/html/manual/mod/*
-%{_libdir}/apache/libperl.so
+%doc Changes INSTALL LICENSE README docs
+#%{contentdir}/manual/mod/*
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
+%{_libdir}/httpd/modules/mod_perl.so
 %{_libdir}/perl?/vendor_perl/*/*/auto/*
-%{_libdir}/perl?/vendor_perl/*/*/Apache*
+%{_libdir}/perl?/vendor_perl/*/*/Apache
+%{_libdir}/perl?/vendor_perl/*/*/Apache2
 %{_libdir}/perl?/vendor_perl/*/*/Bundle/*
-%{_libdir}/perl?/vendor_perl/*/*/cgi*
-%{_libdir}/perl?/vendor_perl/*/*/mod_perl*
-%{_mandir}/man3/*.3*
+%{_libdir}/perl?/vendor_perl/*/*/APR
+%{_libdir}/perl?/vendor_perl/*/*/ModPerl
+%{_libdir}/perl?/vendor_perl/*/*/*.pm
+%{_mandir}/*/*.3*
 
 %changelog
-* Wed Mar 27 2002 Chip Turner <cturner@redhat.com>
+* Wed Jul 24 2002 Gary Benson <gbenson@redhat.com> 1.99_04-2
+- rebuild against new perl
+
+* Mon Jun 24 2002 Gary Benson <gbenson@redhat.com> 1.99_04-1
+- upgrade to 1.99_04
+- fix APR::PerlIO test breakages
+
+* Fri Jun 14 2002 Gary Benson <gbenson@redhat.com> 1.99_03-1
+- upgrade to 1.99_03
+- reenable the test suite
+
+* Fri Jun 14 2002 Gary Benson <gbenson@redhat.com>
+- move /etc/httpd2 back to /etc/httpd
+
+* Thu Jun 14 2002 Gary Benson <gbenson@redhat.com>
+- the example configuration was using the old mod_perl 1.x syntax
+
+* Wed Jun 12 2002 Gary Benson <gbenson@redhat.com> 1.99_02-3
+- filter-requires was broken
+
+* Tue Jun 11 2002 Gary Benson <gbenson@redhat.com> 1.99_02-2
+- do install the Apache-Test stuff
+- whiteout some dependencies
+- disable the test suite again
+
+* Mon Jun 10 2002 Gary Benson <gbenson@redhat.com> 1.99_02-1
+- upgrade to 1.99_02
+- reenable the test suite
+
+* Fri Jun  7 2002 Gary Benson <gbenson@redhat.com> 1.99_01-1
+- install correctly with Perl 5.8.0
+- disable the test suite temporarily
+
+* Thu May 23 2002 Gary Benson <gbenson@redhat.com>
+- don't install the Apache-Test stuff
+- add the config file.
+
+* Wed May 22 2002 Gary Benson <gbenson@redhat.com>
+- automate versioned perl dependency
+- update to 1.99 and change paths for httpd-2.0
+
+* Fri May 17 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-6
+- rebuild in new environment
+
+* Wed Mar 27 2002 Chip Turner <cturner@redhat.com> 1.26-5
 - move to vendor_perl
 
 * Fri Feb 22 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-4
