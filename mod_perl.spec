@@ -3,7 +3,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.99_16
-Release: 1
+Release: 2
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
