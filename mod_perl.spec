@@ -1,21 +1,23 @@
-%define perlver %(rpm -q perl --queryformat '%%{epoch}:%%{version}')
 %define contentdir /var/www
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.99_07
-Release: 5
+Version: 1.99_09
+Release: 10
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
 Source2: filter-requires.sh
-Patch1: mod_perl-1.99_07-loadmodule.patch
-Patch2: mod_perl-1.99_07-MODPERL2.patch
+Source3: reap-stale-servers.sh
+Source4: testlock.sh
+Patch0: mod_perl-1.99_09-aprinc.patch
+Patch2: mod_perl-1.99_09-hash.patch
 License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: httpd >= 2.0.40, perl >= %{perlver}
-BuildPrereq: httpd-devel >= 2.0.40-6, perl
+Requires: httpd >= 2.0.40, perl
+BuildPrereq: httpd-devel >= 2.0.45-14, httpd, perl, gdbm-devel
+BuildPrereq: apr-devel, apr-util-devel
 Prereq: perl
 Requires: httpd-mmn = %(cat %{_includedir}/httpd/.mmn)
 
@@ -32,16 +34,24 @@ no external Perl interpreter has to be started.
 Install mod_perl if you're installing the Apache web server and you'd
 like for it to directly incorporate a Perl interpreter.
 
+%package devel
+Summary: Files needed for building XS modules that use mod_perl
+Group: Development/Libraries
+Requires: mod_perl = %{version}-%{release}, httpd-devel
+
+%description devel 
+The mod_perl-devel package contains the files needed for building XS
+modules that use mod_perl.
+
 %prep
 %setup -q
-%patch1 -p0 -b .loadmodule
-%patch2 -p0 -b .MODPERL2
+%patch0 -p1 -b .aprinc
+%patch2 -p0 -b .hash
 
 %build
-# Compile the module.
 %{__perl} Makefile.PL </dev/null \
 	PREFIX=$RPM_BUILD_ROOT/usr INSTALLDIRS=vendor \
-	MP_APXS=%{_sbindir}/apxs \
+	MP_APXS=%{_sbindir}/apxs MP_APR_CONFIG=%{_bindir}/apr-config \
 	CCFLAGS="$RPM_OPT_FLAGS -fPIC"
 make
 
@@ -49,14 +59,24 @@ make
 #  Need to make t/htdocs/perlio because it isn't expecting to be run as
 #  root and will fail tests that try and write files because the server
 #  will have changed it's uid.
+%ifarch 1386
 mkdir t/htdocs/perlio
 chmod 777 t/htdocs/perlio
+$RPM_SOURCE_DIR/testlock.sh acquire
+$RPM_SOURCE_DIR/reap-stale-servers.sh
 make test
+$RPM_SOURCE_DIR/testlock.sh release
+%endif
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/httpd/modules
-make install MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_libdir}/httpd/modules
+make install \
+    MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_libdir}/httpd/modules \
+    MODPERL_AP_INCLUDEDIR=$RPM_BUILD_ROOT%{_includedir}/httpd
+
+# Fix permissions of solibs to avoid strip failures on non-root builds.
+find $RPM_BUILD_ROOT%{_libdir} -name "*.so" | xargs chmod u+w
 
 # Install the config file
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -74,6 +94,8 @@ install -m 644 $RPM_SOURCE_DIR/perl.conf \
 
 # Remove the temporary files.
 find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs rm
+rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/perllocal.pod
+rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/*/*/perllocal.pod
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -83,17 +105,69 @@ find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs r
 %doc Changes INSTALL LICENSE README docs
 #%{contentdir}/manual/mod/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
+%{_bindir}/*
 %{_libdir}/httpd/modules/mod_perl.so
 %{_libdir}/perl?/vendor_perl/*/*/auto/*
 %{_libdir}/perl?/vendor_perl/*/*/Apache
-%{_libdir}/perl?/vendor_perl/*/*/Apache2
 %{_libdir}/perl?/vendor_perl/*/*/Bundle/*
 %{_libdir}/perl?/vendor_perl/*/*/APR
 %{_libdir}/perl?/vendor_perl/*/*/ModPerl
 %{_libdir}/perl?/vendor_perl/*/*/*.pm
 %{_mandir}/*/*.3*
 
+%files devel
+%defattr(-,root,root)
+%{_includedir}/httpd/*
+
 %changelog
+* Tue Sep  9 2003 Gary Benson <gbenson@redhat.com> 1.99_09-10
+- reenable test suite on i386 only.
+
+* Mon Sep  8 2003 Gary Benson <gbenson@redhat.com> 1.99_09-9
+- Apache::Status requires Apache::compat (#103891).
+- add dependency on gdbm-devel (#103889).
+- avoid strip failures on non-root builds (#103889).
+
+* Fri Sep  5 2003 Gary Benson <gbenson@redhat.com> 
+- remove explicit perl dependency (#103830).
+
+* Wed Sep  3 2003 Gary Benson <gbenson@redhat.com>
+- add PerlWarn and PerlTaintCheck examples to perl.conf.
+
+* Thu Aug 28 2003 Gary Benson <gbenson@redhat.com>
+- implement locking around test suite to avoid breakage when two
+  architectures are built simultaneously on the same machine.
+- make the stale-server killer wait until the server is truly dead,
+  and move it into the lock.
+
+* Wed Aug 27 2003 Gary Benson <gbenson@redhat.com> 1.99_09-8
+- add an Apache::Status example to /etc/httpd/conf.d/perl.conf.
+- kill any stale test servers before building.
+
+* Thu Aug 21 2003 Gary Benson <gbenson@redhat.com> 1.99_09-7
+- fix bad syntax in /etc/httpd/conf.d/perl.conf (#101988).
+
+* Tue Jul 15 2003 Gary Benson <gbenson@redhat.com> 1.99_09-6
+- patch to build with perl 5.8.1.
+- disable test suite.
+- also build on ppc64.
+
+* Wed Jun  4 2003 Gary Benson <gbenson@redhat.com> 1.99_09-5
+- also build on s390x.
+
+* Wed Jun  4 2003 Gary Benson <gbenson@redhat.com> 1.99_09-4
+- add a build time dependency upon httpd
+
+* Fri May 23 2003 Gary Benson <gbenson@redhat.com> 1.99_09-3
+- rebuild against reverted perl, and reenable test suite
+
+* Tue May 13 2003 Joe Orton <jorton@redhat.com> 1.99_09-2
+- pick up APR include directory
+- disable test suite
+
+* Mon May 12 2003 Gary Benson <gbenson@redhat.com>
+- upgrade to 1.99_09
+
 * Mon Feb 10 2003 Gary Benson <gbenson@redhat.com> 1.99_07-5
 - reenable the test suite
 
