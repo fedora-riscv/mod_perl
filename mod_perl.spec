@@ -4,16 +4,17 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.99_04
-Release: 2
+Release: 3
 Group: System Environment/Daemons
 Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
 Source2: filter-requires.sh
+Patch1: mod_perl-1.99_04-2040.patch
 License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: httpd, perl >= %{perlver}
-BuildPrereq: httpd-devel, perl
+Requires: httpd >= 2.0.40, perl >= %{perlver}
+BuildPrereq: httpd-devel >= 2.0.40, perl
 Prereq: perl
 
 %define __find_requires %{SOURCE2}
@@ -31,6 +32,7 @@ like for it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
+%patch1 -p1 -b .2040
 
 %build
 # Compile the module.
@@ -89,6 +91,9 @@ find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs r
 %{_mandir}/*/*.3*
 
 %changelog
+* Mon Aug 12 2002 Gary Benson <gbenson@redhat.com> 1.99_04_3
+- rebuild against httpd-2.0.40
+
 * Wed Jul 24 2002 Gary Benson <gbenson@redhat.com> 1.99_04-2
 - rebuild against new perl
 
