@@ -1,14 +1,16 @@
-%define perlver %(rpm -q perl --queryformat '%%{version}')
+%define perlver %(rpm -q perl --queryformat '%%{epoch}:%%{version}')
 %define contentdir /var/www
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.99_05
-Release: 3
+Version: 1.99_07
+Release: 5
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
 Source2: filter-requires.sh
+Patch1: mod_perl-1.99_07-loadmodule.patch
+Patch2: mod_perl-1.99_07-MODPERL2.patch
 License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
@@ -17,7 +19,7 @@ BuildPrereq: httpd-devel >= 2.0.40-6, perl
 Prereq: perl
 Requires: httpd-mmn = %(cat %{_includedir}/httpd/.mmn)
 
-%define __find_requires %{SOURCE2}
+%define __perl_requires %{SOURCE2}
 
 %description
 Mod_perl incorporates a Perl interpreter into the Apache web server,
@@ -32,6 +34,8 @@ like for it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
+%patch1 -p0 -b .loadmodule
+%patch2 -p0 -b .MODPERL2
 
 %build
 # Compile the module.
@@ -90,16 +94,38 @@ find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs r
 %{_mandir}/*/*.3*
 
 %changelog
+* Mon Feb 10 2003 Gary Benson <gbenson@redhat.com> 1.99_07-5
+- reenable the test suite
+
+* Tue Jan 28 2003 Gary Benson <gbenson@redhat.com> 1.99_07-4
+- disable the test suite until httpd stops being broken
+
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com> 1.99_07-3
+- rebuilt
+
+* Mon Jan 06 2003 Gary Benson <gbenson@redhat.com> 1.99_07-2
+- fix <IfDefine MODPERL2> support (#75194)
+- update depends filtering for rpm-4.2 (#80965)
+
+* Mon Nov 18 2002 Gary Benson <gbenson@redhat.com> 1.99_07-1
+- upgrade to 1.99_07
+
+* Wed Nov  6 2002 Gary Benson <gbenson@redhat.com> 1.99_05-4
+- rebuild in new environment
+
+* Fri Sep 27 2002 Gary Benson <gbenson@redhat.com>
+- add epoch to the perl dependency (#74570)
+
 * Tue Sep  3 2002 Gary Benson <gbenson@redhat.com> 1.99_05-3
 - tweak example in /etc/httpd/conf.d/perl.conf to be more intuitive
 
 * Mon Sep  2 2002 Joe Orton <jorton@redhat.com> 1.99_05-2
 - require httpd-mmn for module ABI compatibility
 
-* Mon Aug 22 2002 Gary Benson <gbenson@redhat.com> 1.99_05_1
+* Mon Aug 22 2002 Gary Benson <gbenson@redhat.com> 1.99_05-1
 - upgrade to 1.99_05
 
-* Mon Aug 12 2002 Gary Benson <gbenson@redhat.com> 1.99_04_3
+* Mon Aug 12 2002 Gary Benson <gbenson@redhat.com> 1.99_04-3
 - rebuild against httpd-2.0.40
 
 * Wed Jul 24 2002 Gary Benson <gbenson@redhat.com> 1.99_04-2
