@@ -3,7 +3,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.99_17
-Release: 1
+Release: 2
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
@@ -116,6 +116,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/*/*/perllocal.pod
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Jan 18 2005 Chip Turner <cturner@redhat.com> 1.99_17-2
+- rebuild for new perl
+
 * Sat Dec 11 2004 Chip Turner <cturner@redhat.com> 1.99_17-1
 - update to 1.99_17
 
