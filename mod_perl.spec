@@ -2,16 +2,14 @@
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.99_09
-Release: 10
+Version: 1.99_11
+Release: 3
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
 Source2: filter-requires.sh
 Source3: reap-stale-servers.sh
 Source4: testlock.sh
-Patch0: mod_perl-1.99_09-aprinc.patch
-Patch2: mod_perl-1.99_09-hash.patch
 License: GPL
 URL: http://perl.apache.org/
 BuildRoot: %{_tmppath}/%{name}-root
@@ -19,7 +17,7 @@ Requires: httpd >= 2.0.40, perl
 BuildPrereq: httpd-devel >= 2.0.45-14, httpd, perl, gdbm-devel
 BuildPrereq: apr-devel, apr-util-devel
 Prereq: perl
-Requires: httpd-mmn = %(cat %{_includedir}/httpd/.mmn)
+Requires: httpd-mmn = 20020903
 
 %define __perl_requires %{SOURCE2}
 
@@ -45,8 +43,6 @@ modules that use mod_perl.
 
 %prep
 %setup -q
-%patch0 -p1 -b .aprinc
-%patch2 -p0 -b .hash
 
 %build
 %{__perl} Makefile.PL </dev/null \
@@ -120,6 +116,14 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/*/*/perllocal.pod
 %{_includedir}/httpd/*
 
 %changelog
+* Wed Dec  3 2003 Chip Turner <cturner@redhat.com> 1.99_11-2
+- fix the Requires: on httpd-mmn since it relied on the build box and not the build root
+
+* Wed Dec  3 2003 Chip Turner <cturner@redhat.com> 1.99_11-1
+- upgrade to 1.99_11
+- remove aprinc patch, no longer necessary
+- remove hash fix, no longer necessary
+
 * Tue Sep  9 2003 Gary Benson <gbenson@redhat.com> 1.99_09-10
 - reenable test suite on i386 only.
 
