@@ -4,7 +4,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.99_05
-Release: 2
+Release: 3
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
@@ -90,6 +90,9 @@ find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs r
 %{_mandir}/*/*.3*
 
 %changelog
+* Tue Sep  3 2002 Gary Benson <gbenson@redhat.com> 1.99_05-3
+- tweak example in /etc/httpd/conf.d/perl.conf to be more intuitive
+
 * Mon Sep  2 2002 Joe Orton <jorton@redhat.com> 1.99_05-2
 - require httpd-mmn for module ABI compatibility
 
