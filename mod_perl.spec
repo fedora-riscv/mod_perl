@@ -6,7 +6,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.24_01
-Release: 2
+Release: 3
 Group: System Environment/Daemons
 Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 License: GPL
@@ -79,6 +79,9 @@ rm   $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto/%{name}/.packlist
 %{_mandir}/man3/*.3*
 
 %changelog
+* Sun Jun 24 2001 Elliot Lee <sopwith@redhat.com>
+- Bump release + rebuild.
+
 * Tue Feb 27 2001 Nalin Dahyabhai <nalin@redhat.com>
 - don't include .bs files
 
