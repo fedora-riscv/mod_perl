@@ -6,7 +6,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.26
-Release: 2
+Release: 4
 Group: System Environment/Daemons
 Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 License: GPL
@@ -17,15 +17,15 @@ BuildPrereq: apache-devel, perl
 Prereq: perl
 
 %description
-Mod_perl incorporates a Perl interpreter into the Apache Web server,
-so the Apache Web server can directly execute Perl code. Mod_perl
-links the Perl runtime library into the Apache Web server and provides
-an object-oriented Perl interface for Apache's C language API. The end
-result is a quicker CGI script turnaround process, as no external Perl
-interpreter has to be started.
+Mod_perl incorporates a Perl interpreter into the Apache web server,
+so that the Apache web server can directly execute Perl code.
+Mod_perl links the Perl runtime library into the Apache web server and
+provides an object-oriented Perl interface for Apache's C language
+API.  The end result is a quicker CGI script turnaround process, since
+no external Perl interpreter has to be started.
 
-Install mod_perl if you are installing the Apache Web server and you
-want it to directly incorporate a Perl interpreter.
+Install mod_perl if you're installing the Apache web server and you'd
+like for it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
@@ -80,6 +80,12 @@ rm   $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto/%{name}/.packlist
 %{_mandir}/man3/*.3*
 
 %changelog
+* Fri Feb 22 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-4
+- rebuild
+
+* Fri Feb  8 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-3
+- rebuild
+
 * Thu Jan 31 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-2
 - turn off large file support, which makes mod_perl think that server request
   structures are the wrong size (heads-up from Doug MacEachern and Chip Turner)
