@@ -3,7 +3,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.99_16
-Release: 3
+Release: 5
 Group: System Environment/Daemons
 Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1: perl.conf
@@ -116,6 +116,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/*/*/perllocal.pod
 %{_includedir}/httpd/*
 
 %changelog
+* Fri Dec  3 2004 Chip Turner <cturner@redhat.com> 1.99_16-5
+- rebuild
+
 * Sun Oct  3 2004 Chip Turner <cturner@redhat.com> 1.99_16-3
 - update filter-depends.sh for Module::Build and Data::Flow
 
