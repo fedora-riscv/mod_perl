@@ -6,7 +6,7 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.26
-Release: 4
+Release: 5
 Group: System Environment/Daemons
 Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 License: GPL
@@ -42,7 +42,7 @@ make test
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-make pure_install PREFIX=$RPM_BUILD_ROOT%{_prefix}
+make pure_install INSTALLDIRS=vendor PREFIX=$RPM_BUILD_ROOT%{_prefix}
 
 # Install the module itself.
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/apache
@@ -58,8 +58,8 @@ rm faq/pod2htm*
 install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/html/manual/mod/mod_perl/
 
 # Remove the temporary files.
-find $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto -name "*.bs" | xargs rm
-rm   $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto/%{name}/.packlist
+find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs rm
+rm   $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto/%{name}/.packlist
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -72,14 +72,17 @@ rm   $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto/%{name}/.packlist
 %doc ToDo apache-modlist.html
 %{contentdir}/html/manual/mod/*
 %{_libdir}/apache/libperl.so
-%{_libdir}/perl?/site_perl/*/*/auto/*
-%{_libdir}/perl?/site_perl/*/*/Apache*
-%{_libdir}/perl?/site_perl/*/*/Bundle/*
-%{_libdir}/perl?/site_perl/*/*/cgi*
-%{_libdir}/perl?/site_perl/*/*/mod_perl*
+%{_libdir}/perl?/vendor_perl/*/*/auto/*
+%{_libdir}/perl?/vendor_perl/*/*/Apache*
+%{_libdir}/perl?/vendor_perl/*/*/Bundle/*
+%{_libdir}/perl?/vendor_perl/*/*/cgi*
+%{_libdir}/perl?/vendor_perl/*/*/mod_perl*
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Mar 27 2002 Chip Turner <cturner@redhat.com>
+- move to vendor_perl
+
 * Fri Feb 22 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-4
 - rebuild
 
