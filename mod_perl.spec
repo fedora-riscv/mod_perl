@@ -6,10 +6,11 @@
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
 Version: 1.24
-Release: 4
+Release: 6
 Group: System Environment/Daemons
 Source0: ftp://ftp.cpan.org/pub/CPAN/modules/by-module/Apache/%{name}-%{version}.tar.gz
-Patch0: %{name}-1.22-rh.patch
+Patch0: mod_perl-1.22-rh.patch
+Patch1: mod_perl-1.24-extutils.patch
 License: GPL
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: webserver, perl = %{perlver}
@@ -29,7 +30,8 @@ like for it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
-%patch -p1 -b .rh
+%patch0 -p1 -b .rh
+%patch1 -p1 -b .extutils
 
 %build
 perl Makefile.PL USE_APXS=1 WITH_APXS=%{_sbindir}/apxs EVERYTHING=1
@@ -74,6 +76,12 @@ install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/html/manual/mod/mod_perl/
 %{_mandir}/man3/*.3*
 
 %changelog
+* Fri Nov 17 2000 Nalin Dahyabhai <nalin@redhat.com>
+- rebuild in new environment
+
+* Fri Aug 30 2000 Nalin Dahyabhai <nalin@redhat.com>
+- patch to fix bug in Apache::ExtUtils (#17147)
+
 * Mon Jul 17 2000 Nalin Dahyabhai <nalin@redhat.com>
 - remove backup files from docs (#14174)
 
