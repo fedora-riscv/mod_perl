@@ -1,12 +1,12 @@
-%define defperlver 5.6.0
+%define defperlver 5.6.1
 %define perlver %(rpm -q perl --queryformat '%%{version}' 2> /dev/null || echo %{defperlver})
 %define perlmajor %(echo %{perlver} | cut -f1 -d.)
 %define contentdir /var/www
 
 Summary: An embedded Perl interpreter for the Apache Web server.
 Name: mod_perl
-Version: 1.24_01
-Release: 3
+Version: 1.26
+Release: 2
 Group: System Environment/Daemons
 Source0: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 License: GPL
@@ -17,22 +17,23 @@ BuildPrereq: apache-devel, perl
 Prereq: perl
 
 %description
-Mod_perl incorporates a Perl interpreter into the Apache web server,
-so that the Apache web server can directly execute Perl code.
-Mod_perl links the Perl runtime library into the Apache web server and
-provides an object-oriented Perl interface for Apache's C language
-API.  The end result is a quicker CGI script turnaround process, since
-no external Perl interpreter has to be started.
+Mod_perl incorporates a Perl interpreter into the Apache Web server,
+so the Apache Web server can directly execute Perl code. Mod_perl
+links the Perl runtime library into the Apache Web server and provides
+an object-oriented Perl interface for Apache's C language API. The end
+result is a quicker CGI script turnaround process, as no external Perl
+interpreter has to be started.
 
-Install mod_perl if you're installing the Apache web server and you'd
-like for it to directly incorporate a Perl interpreter.
+Install mod_perl if you are installing the Apache Web server and you
+want it to directly incorporate a Perl interpreter.
 
 %prep
 %setup -q
 
 %build
+# Compile the module.
 perl Makefile.PL \
-	USE_APXS=1 WITH_APXS=%{_sbindir}/apxs \
+	USE_APXS=1 WITH_APXS=%{_sbindir}/apxs PERL_USELARGEFILES=0 \
 	EVERYTHING=1 CCFLAGS="$RPM_OPT_FLAGS -fPIC"
 make
 
@@ -79,13 +80,23 @@ rm   $RPM_BUILD_ROOT%{_libdir}/perl?/site_perl/*/*/auto/%{name}/.packlist
 %{_mandir}/man3/*.3*
 
 %changelog
-* Sun Jun 24 2001 Elliot Lee <sopwith@redhat.com>
+* Thu Jan 31 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-2
+- turn off large file support, which makes mod_perl think that server request
+  structures are the wrong size (heads-up from Doug MacEachern and Chip Turner)
+
+* Wed Jan 23 2002 Nalin Dahyabhai <nalin@redhat.com> 1.26-1
+- update to 1.26
+
+* Wed Jan 09 2002 Tim Powers <timp@redhat.com> 1.24_01-4
+- automated rebuild
+
+* Sun Jun 24 2001 Elliot Lee <sopwith@redhat.com> 1.24_01-3
 - Bump release + rebuild.
 
-* Tue Feb 27 2001 Nalin Dahyabhai <nalin@redhat.com>
+* Tue Feb 27 2001 Nalin Dahyabhai <nalin@redhat.com> 1.24_01-2
 - don't include .bs files
 
-* Sat Jan 20 2001 Nalin Dahyabhai <nalin@redhat.com>
+* Sat Jan 20 2001 Nalin Dahyabhai <nalin@redhat.com> 1.24_01-1
 - update to 1.24_01
 - add URL
 
