@@ -1,23 +1,26 @@
 %define contentdir /var/www
 
-Summary: An embedded Perl interpreter for the Apache Web server.
-Name: mod_perl
-Version: 1.99_17
-Release: 2
-Group: System Environment/Daemons
-Source: http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
-Source1: perl.conf
-Source2: filter-requires.sh
-Source3: reap-stale-servers.sh
-Source4: testlock.sh
-License: GPL
-URL: http://perl.apache.org/
-BuildRoot: %{_tmppath}/%{name}-root
-Requires: httpd >= 2.0.40, perl
-BuildPrereq: httpd-devel >= 2.0.45-14, httpd, perl, gdbm-devel
-BuildPrereq: apr-devel, apr-util-devel
-Prereq: perl
-Requires: httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
+Name:           mod_perl
+Version:        2.0.0
+Release:        0.rc5.1
+Summary:        An embedded Perl interpreter for the Apache Web server
+
+Group:          System Environment/Daemons
+License:        GPL
+URL:            http://perl.apache.org/
+Source0:        http://perl.apache.org/dist/mod_perl-2.0.0-RC5.tar.gz
+Source1:        perl.conf
+Source2:        filter-requires.sh
+Source3:        reap-stale-servers.sh
+Source4:        testlock.sh
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+BuildRequires:  perl >= 1:5.6.1
+BuildRequires:  httpd-devel >= 2.0.45-14, httpd, gdbm-devel
+BuildRequires:  apr-devel, apr-util-devel
+Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Requires:       httpd >= 2.0.40
+Requires:       httpd-mmn = %([ -a %{_includedir}/httpd/.mmn ] && cat %{_includedir}/httpd/.mmn || echo missing)
 
 %define __perl_requires %{SOURCE2}
 
@@ -32,25 +35,61 @@ no external Perl interpreter has to be started.
 Install mod_perl if you're installing the Apache web server and you'd
 like for it to directly incorporate a Perl interpreter.
 
+
 %package devel
-Summary: Files needed for building XS modules that use mod_perl
-Group: Development/Libraries
-Requires: mod_perl = %{version}-%{release}, httpd-devel
+Summary:        Files needed for building XS modules that use mod_perl
+Group:          Development/Libraries
+Requires:       mod_perl = %{version}-%{release}, httpd-devel
 
 %description devel 
 The mod_perl-devel package contains the files needed for building XS
 modules that use mod_perl.
 
+
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}-RC5
+
 
 %build
-%{__perl} Makefile.PL </dev/null \
-	PREFIX=$RPM_BUILD_ROOT/usr INSTALLDIRS=vendor \
-	MP_APXS=%{_sbindir}/apxs MP_APR_CONFIG=%{_bindir}/apr-config \
-	CCFLAGS="$RPM_OPT_FLAGS -fPIC"
-make
+CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
+	PREFIX=$RPM_BUILD_ROOT/usr \
+	INSTALLDIRS=vendor \
+	MP_APXS=%{_sbindir}/apxs \
+	MP_APR_CONFIG=%{_bindir}/apr-config
+make %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 
+
+%install
+rm -rf $RPM_BUILD_ROOT
+install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/httpd/modules
+make install \
+    MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_libdir}/httpd/modules \
+    MODPERL_AP_INCLUDEDIR=$RPM_BUILD_ROOT%{_includedir}/httpd
+
+# Remove the temporary files.
+find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -type f -name perllocal.pod -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -type f -name '*.bs' -a -size 0 -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
+
+# Fix permissions to avoid strip failures on non-root builds.
+chmod -R u+w $RPM_BUILD_ROOT/*
+
+# Install the config file
+install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
+install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
+
+# Install its manual.
+#mkdir -p $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl
+#install -c -m 644 htdocs/manual/mod/mod_perl.html \
+#        $RPM_BUILD_ROOT%{contentdir}/manual/mod
+
+#make -C faq
+#rm faq/pod2htm*
+#install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl/
+
+
+%check || :
 # Run the test suite.
 #  Need to make t/htdocs/perlio because it isn't expecting to be run as
 #  root and will fail tests that try and write files because the server
@@ -64,58 +103,41 @@ make test
 $RPM_SOURCE_DIR/testlock.sh release
 %endif
 
-%install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/httpd/modules
-make install \
-    MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_libdir}/httpd/modules \
-    MODPERL_AP_INCLUDEDIR=$RPM_BUILD_ROOT%{_includedir}/httpd
-
-# Fix permissions of solibs to avoid strip failures on non-root builds.
-find $RPM_BUILD_ROOT%{_libdir} -name "*.so" | xargs chmod u+w
-
-# Install the config file
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
-install -m 644 $RPM_SOURCE_DIR/perl.conf \
-   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
-
-# Install its manual.
-#mkdir -p $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl
-#install -c -m 644 htdocs/manual/mod/mod_perl.html \
-#        $RPM_BUILD_ROOT%{contentdir}/manual/mod
-
-#make -C faq
-#rm faq/pod2htm*
-#install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl/
-
-# Remove the temporary files.
-find $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/auto -name "*.bs" | xargs rm
-rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/vendor_perl/*/*/perllocal.pod
-rm -f $RPM_BUILD_ROOT%{_libdir}/perl?/*/*/perllocal.pod
 
 %clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
+
 
 %files
-%defattr(-,root,root)
-%doc Changes INSTALL LICENSE README docs
+%defattr(-,root,root,-)
+%doc Changes LICENSE README* STATUS SVN-MOVE docs/
 #%{contentdir}/manual/mod/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
 %{_bindir}/*
 %{_libdir}/httpd/modules/mod_perl.so
-%{_libdir}/perl?/vendor_perl/*/*/auto/*
-%{_libdir}/perl?/vendor_perl/*/*/Apache
-%{_libdir}/perl?/vendor_perl/*/*/Bundle/*
-%{_libdir}/perl?/vendor_perl/*/*/APR
-%{_libdir}/perl?/vendor_perl/*/*/ModPerl
-%{_libdir}/perl?/vendor_perl/*/*/*.pm
-%{_mandir}/*/*.3*
+%{perl_vendorarch}/auto/*
+%{perl_vendorarch}/Apache/
+%{perl_vendorarch}/Apache2/
+%{perl_vendorarch}/Bundle/
+%{perl_vendorarch}/APR/
+%{perl_vendorarch}/ModPerl/
+%{perl_vendorarch}/*.pm
+%{_mandir}/man3/*.3*
+
 
 %files devel
-%defattr(-,root,root)
+%defattr(-,root,root,-)
 %{_includedir}/httpd/*
 
+
 %changelog
+* Sat Apr 16 2005 Warren Togami <wtogami@redhat.com> - 2.0.0-0.rc5.1
+- 2.0.0-RC5
+
+* Sun Apr 03 2005 Jose Pedro Oliveira <jpo@di.uminho.pt> - 2.0.0-0.rc4.1
+- Update to 2.0.0-RC4.
+- Specfile cleanup. (#153236)
+
 * Tue Jan 18 2005 Chip Turner <cturner@redhat.com> 1.99_17-2
 - rebuild for new perl
 
