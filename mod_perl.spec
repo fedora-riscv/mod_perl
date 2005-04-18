@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.0
-Release:        0.rc5.2
+Release:        0.rc5.3
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -90,17 +90,19 @@ install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
 
 
 %check || :
-# Run the test suite.
-#  Need to make t/htdocs/perlio because it isn't expecting to be run as
+# Run the test suite --- NOT, because it has requirements that cannot be
+# assumed to be satisfied in build roots.
+%if 0
+#  Need to chmod t/htdocs/perlio because it isn't expecting to be run as
 #  root and will fail tests that try and write files because the server
 #  will have changed it's uid.
-%ifarch 1386
-mkdir t/htdocs/perlio
+%ifarch %{ix86}
 chmod 777 t/htdocs/perlio
 $RPM_SOURCE_DIR/testlock.sh acquire
 $RPM_SOURCE_DIR/reap-stale-servers.sh
 make test
 $RPM_SOURCE_DIR/testlock.sh release
+%endif
 %endif
 
 
@@ -131,6 +133,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Apr 18 2005 Ville Skyttä <ville.skytta at iki.fi> - 2.0.0-0.rc5.3
+- Fix sample configuration.
+- Explicitly disable the test suite. (#112563)
+
 * Mon Apr 18 2005 Joe Orton <jorton@redhat.com> 2.0.0-0.rc5.2
 - fix filter-requires for new Apache2:: modules
 
