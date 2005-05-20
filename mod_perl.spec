@@ -2,13 +2,13 @@
 
 Name:           mod_perl
 Version:        2.0.0
-Release:        0.rc5.3
+Release:        1
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
 License:        GPL
 URL:            http://perl.apache.org/
-Source0:        http://perl.apache.org/dist/mod_perl-2.0.0-RC5.tar.gz
+Source0:        http://perl.apache.org/dist/mod_perl-2.0.0.tar.gz
 Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        reap-stale-servers.sh
@@ -47,7 +47,7 @@ modules that use mod_perl.
 
 
 %prep
-%setup -q -n %{name}-%{version}-RC5
+%setup -q -n %{name}-%{version}
 
 
 %build
@@ -133,6 +133,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri May 20 2005 Joe Orton <jorton@redhat.com> 2.0.0-1
+- update to 2.0.0 final
+
 * Mon Apr 18 2005 Ville Skyttä <ville.skytta at iki.fi> - 2.0.0-0.rc5.3
 - Fix sample configuration.
 - Explicitly disable the test suite. (#112563)
