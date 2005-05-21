@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.0
-Release:        2
+Release:        3
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -19,8 +19,6 @@ BuildRequires:  perl >= 1:5.6.1
 BuildRequires:  httpd-devel >= 2.0.47, httpd, gdbm-devel
 BuildRequires:  apr-devel, apr-util-devel
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Requires:       perl >= 3:5.8.6-14
-Requires:       httpd >= 2.0.47
 Requires:       httpd-mmn = %([ -a %{_includedir}/httpd/.mmn ] && cat %{_includedir}/httpd/.mmn || echo missing)
 
 %define __perl_requires %{SOURCE2}
@@ -134,8 +132,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Fri May 20 2005 Warren Togami <wtogami@redhat.com> 2.0.0-2
-- new requires (#114651 jpo)
+* Fri May 20 2005 Warren Togami <wtogami@redhat.com> 2.0.0-3
+- dep changes (#114651 jpo and ville)
 
 * Fri May 20 2005 Joe Orton <jorton@redhat.com> 2.0.0-1
 - update to 2.0.0 final
