@@ -1,14 +1,14 @@
 %define contentdir /var/www
 
 Name:           mod_perl
-Version:        2.0.0
-Release:        3
+Version:        2.0.1
+Release:        1.fc5
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
 License:        GPL
 URL:            http://perl.apache.org/
-Source0:        http://perl.apache.org/dist/mod_perl-2.0.0.tar.gz
+Source0:        http://perl.apache.org/dist/mod_perl-2.0.1.tar.gz
 Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        reap-stale-servers.sh
@@ -132,6 +132,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jun 17 2005 Warren Togami <wtogami@redhat.com> 2.0.1-1
+- 2.0.1
+
 * Fri May 20 2005 Warren Togami <wtogami@redhat.com> 2.0.0-3
 - dep changes (#114651 jpo and ville)
 
