@@ -1,14 +1,14 @@
 %define contentdir /var/www
 
 Name:           mod_perl
-Version:        2.0.1
+Version:        2.0.2
 Release:        2
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
 License:        GPL
 URL:            http://perl.apache.org/
-Source0:        http://perl.apache.org/dist/mod_perl-2.0.1.tar.gz
+Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        reap-stale-servers.sh
@@ -19,7 +19,7 @@ BuildRequires:  perl >= 1:5.6.1
 BuildRequires:  httpd-devel >= 2.0.47, httpd, gdbm-devel
 BuildRequires:  apr-devel, apr-util-devel
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Requires:       httpd-mmn = %([ -a %{_includedir}/httpd/.mmn ] && cat %{_includedir}/httpd/.mmn || echo missing)
+Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
 %define __perl_requires %{SOURCE2}
 
@@ -132,6 +132,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Oct 26 2005 Joe Orton <jorton@redhat.com> 2.0.2-2
+- update to 2.0.2
+
 * Thu Oct 20 2005 Joe Orton <jorton@redhat.com> 2.0.1-2
 - rebuild
 
