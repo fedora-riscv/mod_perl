@@ -16,8 +16,8 @@ Source4:        testlock.sh
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl >= 1:5.6.1
-BuildRequires:  httpd-devel >= 2.0.47, httpd, gdbm-devel
-BuildRequires:  apr-devel, apr-util-devel
+BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
+BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
@@ -54,7 +54,7 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
 	PREFIX=$RPM_BUILD_ROOT/usr \
 	INSTALLDIRS=vendor \
 	MP_APXS=%{_sbindir}/apxs \
-	MP_APR_CONFIG=%{_bindir}/apr-config
+	MP_APR_CONFIG=%{_bindir}/apr-1-config
 make %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 
 
