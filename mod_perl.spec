@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.2
-Release:        2
+Release:        3
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -132,6 +132,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Dec  2 2005 Joe Orton <jorton@redhat.com> 2.0.2-3
+- rebuild for httpd 2.2
+
 * Wed Oct 26 2005 Joe Orton <jorton@redhat.com> 2.0.2-2
 - update to 2.0.2
 
