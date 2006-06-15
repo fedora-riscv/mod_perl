@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.2
-Release:        5.1
+Release:        6
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -13,6 +13,7 @@ Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        reap-stale-servers.sh
 Source4:        testlock.sh
+Patch0:         mod_perl-2.0.2-multilib.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl >= 1:5.6.1
@@ -47,7 +48,7 @@ modules that use mod_perl.
 
 %prep
 %setup -q -n %{name}-%{version}
-
+%patch0 -p1 -b .multilib
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -132,6 +133,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jun 15 2006 Joe Orton <jorton@redhat.com> 2.0.2-6
+- fix multilib conflicts in -devel (#192733)
+
 * Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 2.0.2-5.1
 - bump again for double-long bug on ppc(64)
 
