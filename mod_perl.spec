@@ -1,8 +1,8 @@
 %define contentdir /var/www
 
 Name:           mod_perl
-Version:        2.0.2
-Release:        6.1
+Version:        2.0.3
+Release:        2
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -11,8 +11,6 @@ URL:            http://perl.apache.org/
 Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        filter-requires.sh
-Source3:        reap-stale-servers.sh
-Source4:        testlock.sh
 Patch0:         mod_perl-2.0.2-multilib.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -48,7 +46,7 @@ modules that use mod_perl.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .multilib
+%patch0 -p1
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -79,36 +77,26 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
 
-# Install its manual.
-#mkdir -p $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl
-#install -c -m 644 htdocs/manual/mod/mod_perl.html \
-#        $RPM_BUILD_ROOT%{contentdir}/manual/mod
+# Trim modules which are only used for building mod_perl and don't
+# need to be installed:
+trimmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
+          ModPerl::TestRun ModPerl::Config ModPerl::WrapXS \
+          ModPerl::BuildOptions ModPerl::Manifest \
+          ModPerl::MapUtil ModPerl::StructureMap \
+          ModPerl::TypeMap ModPerl::FunctionMap ModPerl::MM \
+          ModPerl::TestReport"
+for m in $trimmods; do
+   rm -fv $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm
+   fn=${m//::/\/}
+   rm -v $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm
+done
 
-#make -C faq
-#rm faq/pod2htm*
-#install -m644 faq/*.html $RPM_BUILD_ROOT%{contentdir}/manual/mod/mod_perl/
-
-
-%check || :
-# Run the test suite --- NOT, because it has requirements that cannot be
-# assumed to be satisfied in build roots.
-%if 0
-#  Need to chmod t/htdocs/perlio because it isn't expecting to be run as
-#  root and will fail tests that try and write files because the server
-#  will have changed it's uid.
-%ifarch %{ix86}
-chmod 777 t/htdocs/perlio
-$RPM_SOURCE_DIR/testlock.sh acquire
-$RPM_SOURCE_DIR/reap-stale-servers.sh
-make test
-$RPM_SOURCE_DIR/testlock.sh release
-%endif
-%endif
-
+# Completely remove Apache::Test - can be packaged separately
+rm -rf $RPM_BUILD_ROOT%{_mandir}/man3/Apache::Test*
+rm -rf $RPM_BUILD_ROOT%{perl_vendorarch}/Apache
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
 
 %files
 %defattr(-,root,root,-)
@@ -118,7 +106,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/*
 %{_libdir}/httpd/modules/mod_perl.so
 %{perl_vendorarch}/auto/*
-%{perl_vendorarch}/Apache/
 %{perl_vendorarch}/Apache2/
 %{perl_vendorarch}/Bundle/
 %{perl_vendorarch}/APR/
@@ -126,13 +113,17 @@ rm -rf $RPM_BUILD_ROOT
 %{perl_vendorarch}/*.pm
 %{_mandir}/man3/*.3*
 
-
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/httpd/*
 
-
 %changelog
+* Mon Dec  4 2006 Joe Orton <jorton@redhat.com> 2.0.3-2
+- update to 2.0.3
+- remove droplet in buildroot from multilib patch
+- drop build-related ModPerl:: modules and Apache::Test (#197841)
+- spec file cleanups
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - sh: line 0: fg: no job control
 - rebuild
 
