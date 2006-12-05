@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        2
+Release:        3
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -54,8 +54,8 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
 	INSTALLDIRS=vendor \
 	MP_APXS=%{_sbindir}/apxs \
 	MP_APR_CONFIG=%{_bindir}/apr-1-config
-make %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
-
+make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -84,11 +84,13 @@ trimmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           ModPerl::BuildOptions ModPerl::Manifest \
           ModPerl::MapUtil ModPerl::StructureMap \
           ModPerl::TypeMap ModPerl::FunctionMap ModPerl::MM \
-          ModPerl::TestReport"
+          ModPerl::ParseSource \
+          Apache2::Build Apache2::ParseSource Apache2::BuildConfig"
 for m in $trimmods; do
    rm -fv $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm
    fn=${m//::/\/}
    rm -v $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm
+   rm -rfv $RPM_BUILD_ROOT%{perl_vendorarch}/auto/${fn}
 done
 
 # Completely remove Apache::Test - can be packaged separately
@@ -118,6 +120,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Dec  5 2006 Joe Orton <jorton@redhat.com> 2.0.3-3
+- trim modules even more aggressively (#197841)
+
 * Mon Dec  4 2006 Joe Orton <jorton@redhat.com> 2.0.3-2
 - update to 2.0.3
 - remove droplet in buildroot from multilib patch
