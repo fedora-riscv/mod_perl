@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        3
+Release:        4
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -83,7 +83,7 @@ trimmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           ModPerl::TestRun ModPerl::Config ModPerl::WrapXS \
           ModPerl::BuildOptions ModPerl::Manifest \
           ModPerl::MapUtil ModPerl::StructureMap \
-          ModPerl::TypeMap ModPerl::FunctionMap ModPerl::MM \
+          ModPerl::TypeMap ModPerl::FunctionMap \
           ModPerl::ParseSource \
           Apache2::Build Apache2::ParseSource Apache2::BuildConfig"
 for m in $trimmods; do
@@ -120,6 +120,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Wed Jan 31 2007 Joe Orton <jorton@redhat.com> 2.0.3-4
+- restore ModPerl::MM
+
 * Tue Dec  5 2006 Joe Orton <jorton@redhat.com> 2.0.3-3
 - trim modules even more aggressively (#197841)
 
