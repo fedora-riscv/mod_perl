@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        4
+Release:        5
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -77,33 +77,38 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
 
-# Trim modules which are only used for building mod_perl and don't
-# need to be installed:
-trimmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
+> devel.files
+
+# Move set of modules to -devel
+devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           ModPerl::TestRun ModPerl::Config ModPerl::WrapXS \
           ModPerl::BuildOptions ModPerl::Manifest \
           ModPerl::MapUtil ModPerl::StructureMap \
           ModPerl::TypeMap ModPerl::FunctionMap \
-          ModPerl::ParseSource \
+          ModPerl::ParseSource ModPerl::MM \
           Apache2::Build Apache2::ParseSource Apache2::BuildConfig"
-for m in $trimmods; do
-   rm -fv $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm
+for m in $devmods; do
+   test -f $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm &&
+     echo "%{_mandir}/man3/${m}.3pm\*" >> devel.files
    fn=${m//::/\/}
-   rm -v $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm
-   rm -rfv $RPM_BUILD_ROOT%{perl_vendorarch}/auto/${fn}
+   echo %{perl_vendorarch}/${fn}.pm >> devel.files
+   echo $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm
+   test -d $RPM_BUILD_ROOT%{perl_vendorarch}/auto/${fn} && 
+        echo %{perl_vendorarch}/auto/${fn} >> devel.files
 done
 
 # Completely remove Apache::Test - can be packaged separately
 rm -rf $RPM_BUILD_ROOT%{_mandir}/man3/Apache::Test*
 rm -rf $RPM_BUILD_ROOT%{perl_vendorarch}/Apache
 
+sed 's/^/%%exclude /' devel.files > exclude.files
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -f exclude.files
 %defattr(-,root,root,-)
 %doc Changes LICENSE README* STATUS SVN-MOVE docs/
-#%{contentdir}/manual/mod/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
 %{_bindir}/*
 %{_libdir}/httpd/modules/mod_perl.so
@@ -115,11 +120,14 @@ rm -rf $RPM_BUILD_ROOT
 %{perl_vendorarch}/*.pm
 %{_mandir}/man3/*.3*
 
-%files devel
+%files devel -f devel.files
 %defattr(-,root,root,-)
 %{_includedir}/httpd/*
 
 %changelog
+* Mon Feb 26 2007 Joe Orton <jorton@redhat.com> 2.0.3-5
+- repackage set of trimmed modules, but only in -devel
+
 * Wed Jan 31 2007 Joe Orton <jorton@redhat.com> 2.0.3-4
 - restore ModPerl::MM
 
