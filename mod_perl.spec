@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        5
+Release:        6
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -89,7 +89,7 @@ devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           Apache2::Build Apache2::ParseSource Apache2::BuildConfig"
 for m in $devmods; do
    test -f $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm &&
-     echo "%{_mandir}/man3/${m}.3pm\*" >> devel.files
+     echo "%{_mandir}/man3/${m}.3pm*" >> devel.files
    fn=${m//::/\/}
    echo %{perl_vendorarch}/${fn}.pm >> devel.files
    echo $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm
@@ -125,6 +125,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Feb 27 2007 Joe Orton <jorton@redhat.com> 2.0.3-6
+- filter more Apache::Test requirements
+
 * Mon Feb 26 2007 Joe Orton <jorton@redhat.com> 2.0.3-5
 - repackage set of trimmed modules, but only in -devel
 
