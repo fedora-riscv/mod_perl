@@ -14,7 +14,7 @@ Source2:        filter-requires.sh
 Patch0:         mod_perl-2.0.2-multilib.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  perl >= 1:5.6.1
+BuildRequires:  perl >= 1:5.6.1, perl-devel
 BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
 BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
@@ -127,6 +127,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Feb 28 2007 Joe Orton <jorton@redhat.com> 2.0.3-7
 - also restore Apache::Test to devel
+- add BR for perl-devel
 
 * Tue Feb 27 2007 Joe Orton <jorton@redhat.com> 2.0.3-6
 - filter more Apache::Test requirements
