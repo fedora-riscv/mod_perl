@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        6
+Release:        7
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -77,8 +77,6 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
 
-> devel.files
-
 # Move set of modules to -devel
 devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           ModPerl::TestRun ModPerl::Config ModPerl::WrapXS \
@@ -86,22 +84,24 @@ devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           ModPerl::MapUtil ModPerl::StructureMap \
           ModPerl::TypeMap ModPerl::FunctionMap \
           ModPerl::ParseSource ModPerl::MM \
-          Apache2::Build Apache2::ParseSource Apache2::BuildConfig"
+          Apache2::Build Apache2::ParseSource Apache2::BuildConfig \
+          Apache Bundle::ApacheTest"
 for m in $devmods; do
    test -f $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm &&
-     echo "%{_mandir}/man3/${m}.3pm*" >> devel.files
+     echo "%{_mandir}/man3/${m}.3pm*"
    fn=${m//::/\/}
-   echo %{perl_vendorarch}/${fn}.pm >> devel.files
-   echo $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm
+   test -f $RPM_BUILD_ROOT%{perl_vendorarch}/${fn}.pm &&
+        echo %{perl_vendorarch}/${fn}.pm
+   test -d $RPM_BUILD_ROOT%{perl_vendorarch}/${fn} && 
+        echo %{perl_vendorarch}/${fn}
    test -d $RPM_BUILD_ROOT%{perl_vendorarch}/auto/${fn} && 
-        echo %{perl_vendorarch}/auto/${fn} >> devel.files
-done
+        echo %{perl_vendorarch}/auto/${fn}
+done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 
 # Completely remove Apache::Test - can be packaged separately
-rm -rf $RPM_BUILD_ROOT%{_mandir}/man3/Apache::Test*
-rm -rf $RPM_BUILD_ROOT%{perl_vendorarch}/Apache
+#rm -rf $RPM_BUILD_ROOT%{_mandir}/man3/Apache::Test*
+#rm -rf $RPM_BUILD_ROOT%{perl_vendorarch}/Apache
 
-sed 's/^/%%exclude /' devel.files > exclude.files
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -125,6 +125,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Wed Feb 28 2007 Joe Orton <jorton@redhat.com> 2.0.3-7
+- also restore Apache::Test to devel
+
 * Tue Feb 27 2007 Joe Orton <jorton@redhat.com> 2.0.3-6
 - filter more Apache::Test requirements
 
