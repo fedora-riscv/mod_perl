@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        7
+Release:        9
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -11,6 +11,7 @@ URL:            http://perl.apache.org/
 Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        filter-requires.sh
+Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.2-multilib.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -21,6 +22,7 @@ Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
 %define __perl_requires %{SOURCE2}
+%define __perl_provides %{SOURCE3}
 
 %description
 Mod_perl incorporates a Perl interpreter into the Apache web server,
@@ -125,6 +127,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Fri Apr 20 2007 Joe Orton <jorton@redhat.com> 2.0.3-8
+- filter provide of perl(warnings) (#228429)
+
 * Wed Feb 28 2007 Joe Orton <jorton@redhat.com> 2.0.3-7
 - also restore Apache::Test to devel
 - add BR for perl-devel
