@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        9
+Release:        9.1%{?dist}
 Summary:        An embedded Perl interpreter for the Apache Web server
 
 Group:          System Environment/Daemons
@@ -13,6 +13,7 @@ Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.2-multilib.patch
+Patch1:         mod_perl-2.0.2-CVE-2007-1349.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl >= 1:5.6.1, perl-devel
@@ -49,6 +50,7 @@ modules that use mod_perl.
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -127,6 +129,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Fri Jun  8 2007 Joe Orton <jorton@redhat.com> 2.0.3-9.1.fc7
+- add security fix for CVE-2007-1349
+
 * Fri Apr 20 2007 Joe Orton <jorton@redhat.com> 2.0.3-8
 - filter provide of perl(warnings) (#228429)
 
