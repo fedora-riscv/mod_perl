@@ -2,11 +2,11 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        9
-Summary:        An embedded Perl interpreter for the Apache Web server
+Release:        10
+Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
-License:        GPL
+License:        ASL 2.0
 URL:            http://perl.apache.org/
 Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
@@ -127,6 +127,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Mon Aug 20 2007 Joe Orton <jorton@redhat.com> 2.0.3-10
+- fix License
+
 * Fri Apr 20 2007 Joe Orton <jorton@redhat.com> 2.0.3-8
 - filter provide of perl(warnings) (#228429)
 
