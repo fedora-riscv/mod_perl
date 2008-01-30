@@ -1,0 +1,119 @@
+
+http://svn.apache.org/viewvc?rev=615751&view=rev
+
+--- mod_perl-2.0.3/src/modules/perl/mod_perl.h.perl510attrs
++++ mod_perl-2.0.3/src/modules/perl/mod_perl.h
+@@ -138,11 +138,6 @@ apr_status_t modperl_response_finish(req
+ int modperl_response_handler(request_rec *r);
+ int modperl_response_handler_cgi(request_rec *r);
+ 
+-/* betting on Perl*Handlers not using CvXSUBANY
+- * mod_perl reuses this field for handler attributes
+- */
+-#define MP_CODE_ATTRS(cv) (CvXSUBANY((CV*)cv).any_i32)
+-
+ #define MgTypeExt(mg) (mg->mg_type == '~')
+ 
+ typedef void MP_FUNC_NONSTD_T(modperl_var_modify_t) (apr_table_t *,
+--- mod_perl-2.0.3/src/modules/perl/modperl_util.h.perl510attrs
++++ mod_perl-2.0.3/src/modules/perl/modperl_util.h
+@@ -149,4 +149,6 @@ int  modperl_restart_count(void);
+ SV *modperl_pnotes(pTHX_ HV **pnotes, SV *key, SV *val,
+                    request_rec *r, conn_rec *c);
+ 
++U16 *modperl_code_attrs(pTHX_ CV *cv);
++
+ #endif /* MODPERL_UTIL_H */
+--- mod_perl-2.0.3/src/modules/perl/modperl_mgv.c.perl510attrs
++++ mod_perl-2.0.3/src/modules/perl/modperl_mgv.c
+@@ -271,7 +271,7 @@ int modperl_mgv_resolve(pTHX_ modperl_ha
+     }
+     else {
+         if ((cv = get_cv(name, FALSE))) {
+-            handler->attrs = (U32)MP_CODE_ATTRS(cv);
++            handler->attrs = *modperl_code_attrs(aTHX_ cv);
+             handler->mgv_cv =
+                 modperl_mgv_compile(aTHX_ p, HvNAME(GvSTASH(CvGV(cv))));
+             modperl_mgv_append(aTHX_ p, handler->mgv_cv, GvNAME(CvGV(cv)));
+@@ -334,7 +334,7 @@ int modperl_mgv_resolve(pTHX_ modperl_ha
+             modperl_mgv_new_name(handler->mgv_obj, p, name);
+         }
+ 
+-        handler->attrs = (U32)MP_CODE_ATTRS(cv);
++        handler->attrs = *modperl_code_attrs(aTHX_ cv);
+         /* note: this is the real function after @ISA lookup */
+         handler->mgv_cv = modperl_mgv_compile(aTHX_ p, HvNAME(GvSTASH(gv)));
+         modperl_mgv_append(aTHX_ p, handler->mgv_cv, handler_name);
+--- mod_perl-2.0.3/src/modules/perl/modperl_types.h.perl510attrs
++++ mod_perl-2.0.3/src/modules/perl/modperl_types.h
+@@ -196,7 +196,7 @@ struct modperl_handler_t {
+     const char *name; 
+     CV *cv;
+     U8 flags;
+-    U32 attrs;
++    U16 attrs;
+     modperl_handler_t *next;
+ };
+ 
+--- mod_perl-2.0.3/src/modules/perl/modperl_util.c.perl510attrs
++++ mod_perl-2.0.3/src/modules/perl/modperl_util.c
+@@ -903,3 +903,13 @@ SV *modperl_pnotes(pTHX_ HV **pnotes, SV
+     return retval ? SvREFCNT_inc(retval) : &PL_sv_undef;
+ }
+  
++U16 *modperl_code_attrs(pTHX_ CV *cv) {
++    MAGIC *mg;    
++
++    if (!SvMAGICAL(cv)) {
++       sv_magic((SV*)cv, Nullsv, PERL_MAGIC_ext, NULL, -1); 
++    }
++
++    mg = mg_find((SV*)cv, PERL_MAGIC_ext);
++    return &(mg->mg_private);
++}
+--- mod_perl-2.0.3/xs/Apache2/Filter/Apache2__Filter.h.perl510attrs
++++ mod_perl-2.0.3/xs/Apache2/Filter/Apache2__Filter.h
+@@ -86,9 +86,9 @@ static MP_INLINE apr_size_t mpxs_Apache2
+     return len;
+ }
+ 
+-static MP_INLINE U32 *modperl_filter_attributes(SV *package, SV *cvrv)
++static MP_INLINE U16 *modperl_filter_attributes(pTHX_ SV *package, SV *cvrv)
+ {
+-    return (U32 *)&MP_CODE_ATTRS(SvRV(cvrv));
++    return modperl_code_attrs(aTHX_ (CV*)SvRV(cvrv));
+ }
+ 
+ #ifdef MP_TRACE
+@@ -118,7 +118,7 @@ static MP_INLINE U32 *modperl_filter_att
+ MP_STATIC XS(MPXS_modperl_filter_attributes)
+ {
+     dXSARGS;
+-    U32 *attrs = modperl_filter_attributes(ST(0), ST(1));
++    U16 *attrs = modperl_filter_attributes(aTHX_ ST(0), ST(1));
+     I32 i;
+ #ifdef MP_TRACE
+     HV *stash = gv_stashsv(ST(0), TRUE);
+--- mod_perl-2.0.3/xs/tables/current/ModPerl/FunctionTable.pm.perl510attrs
++++ mod_perl-2.0.3/xs/tables/current/ModPerl/FunctionTable.pm
+@@ -1239,6 +1239,20 @@ $ModPerl::FunctionTable = [
+     ]
+   },
+   {
++    'return_type' => 'U16 *',
++    'name' => 'modperl_code_attrs',
++    'args' => [
++     {
++        'type' => 'PerlInterpreter *',
++        'name' => 'my_perl'
++      },
++      {
++        'type' => 'CV *',
++        'name' => 'cv'
++      }
++    ]
++  },
++  {
+     'return_type' => 'int',
+     'name' => 'modperl_config_apply_PerlModule',
+     'args' => [

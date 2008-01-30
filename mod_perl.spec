@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        18
+Release:        19
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -14,6 +14,7 @@ Source2:        filter-requires.sh
 Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.2-multilib.patch
 Patch1:         mod_perl-2.0.3-perl510.patch
+Patch2:         mod_perl-2.0.3-perl510attrs.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
@@ -51,6 +52,7 @@ modules that use mod_perl.
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1 -b .perl510
+%patch2 -p1 -b .perl510attrs
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -129,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Wed Jan 30 2008 Joe Orton <jorton@redhat.com> 2.0.3-19
+- further fixes for perl 5.10 (upstream r480903, r615751)
+
 * Wed Jan 30 2008 Joe Orton <jorton@redhat.com> 2.0.3-18
 - fix build with perl 5.10 (upstream r480890)
 
