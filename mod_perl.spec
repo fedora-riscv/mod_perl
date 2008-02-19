@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.3
-Release:        19
+Release:        20
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -131,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 2.0.3-20
+- Autorebuild for GCC 4.3
+
 * Wed Jan 30 2008 Joe Orton <jorton@redhat.com> 2.0.3-19
 - further fixes for perl 5.10 (upstream r480903, r615751)
 
