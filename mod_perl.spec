@@ -1,8 +1,8 @@
 %define contentdir /var/www
 
 Name:           mod_perl
-Version:        2.0.3
-Release:        21
+Version:        2.0.4
+Release:        2
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -13,8 +13,6 @@ Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.2-multilib.patch
-Patch1:         mod_perl-2.0.3-perl510.patch
-Patch2:         mod_perl-2.0.3-perl510attrs.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
@@ -51,8 +49,6 @@ modules that use mod_perl.
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1
-%patch1 -p1 -b .perl510
-%patch2 -p1 -b .perl510attrs
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -131,6 +127,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Fri Apr 18 2008 Joe Orton <jorton@redhat.com> 2.0.4-2
+- update to 2.0.4
+
 * Wed Feb 27 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 2.0.3-21
 - Rebuild for perl 5.10 (again)
 
