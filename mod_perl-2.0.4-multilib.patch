@@ -2,9 +2,9 @@
 Generate the XS typemap files in sorted order; ensures that the
 devel package contents do not differe across multilib platforms.
 
---- mod_perl-2.0.2/lib/ModPerl/TypeMap.pm.multilib
-+++ mod_perl-2.0.2/lib/ModPerl/TypeMap.pm
-@@ -440,12 +440,12 @@
+--- mod_perl-2.0.4/lib/ModPerl/TypeMap.pm.multilib
++++ mod_perl-2.0.4/lib/ModPerl/TypeMap.pm
+@@ -442,12 +442,12 @@ sub typedefs_code {
          $code .= qq{\#include "$_"\n}
      }
  
@@ -19,7 +19,7 @@ devel package contents do not differe across multilib platforms.
          next if $seen{ $t->[1] }++;
          $code .= "typedef $t->[0] $t->[1];\n";
      }
-@@ -468,7 +468,9 @@
+@@ -470,7 +470,9 @@ sub sv_convert_code {
      my %seen;
      my $code = "";
  

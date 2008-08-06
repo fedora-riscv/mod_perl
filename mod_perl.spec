@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        4
+Release:        5
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -12,7 +12,7 @@ Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        filter-provides.sh
-Patch0:         mod_perl-2.0.2-multilib.patch
+Patch0:         mod_perl-2.0.4-multilib.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
@@ -127,6 +127,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Wed Aug  6 2008 Joe Orton <jorton@redhat.com> 2.0.4-5
+- rebuild to fix patch fuzz (#427758)
+
 * Mon Jul 14 2008 Joe Orton <jorton@redhat.com> 2.0.4-4
 - rebuild for new BDB
 
