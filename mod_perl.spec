@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        5
+Release:        6
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
