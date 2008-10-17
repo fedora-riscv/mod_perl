@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        6
+Release:        7
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -13,6 +13,7 @@ Source1:        perl.conf
 Source2:        filter-requires.sh
 Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.4-multilib.patch
+Patch1:         mod_perl-2.0.4-inline.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
@@ -49,6 +50,7 @@ modules that use mod_perl.
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1
+%patch1 -p1 -b .inline
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -127,6 +129,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Fri Oct 17 2008 Joe Orton <jorton@redhat.com> 2.0.4-7
+- fix inline abuse (#459351)
+
 * Wed Aug  6 2008 Joe Orton <jorton@redhat.com> 2.0.4-5
 - rebuild to fix patch fuzz (#427758)
 
