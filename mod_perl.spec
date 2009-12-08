@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        9
+Release:        10%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -14,6 +14,7 @@ Source2:        filter-requires.sh
 Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.4-multilib.patch
 Patch1:         mod_perl-2.0.4-inline.patch
+Patch2:         mod_perl-2.0.4-CVE-2009-0796.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
@@ -51,6 +52,7 @@ modules that use mod_perl.
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1 -b .inline
+%patch2 -p1
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
@@ -129,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Dec  8 2009 Joe Orton <jorton@redhat.com> - 2.0.4-10
+- add security fix for CVE-2009-0796 (#544455)
+
 * Sat Jul 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.4-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
