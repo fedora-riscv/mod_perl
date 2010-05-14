@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -131,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Fri May 14 2010 Marcela Maslanova <mmaslano@redhat.com> - 2.0.4-11
+- Mass rebuild with perl-5.12.0
+
 * Tue Dec  8 2009 Joe Orton <jorton@redhat.com> - 2.0.4-10
 - add security fix for CVE-2009-0796 (#544455)
 
