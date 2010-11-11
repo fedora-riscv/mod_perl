@@ -1,8 +1,8 @@
-%define contentdir /var/www
+%global contentdir /var/www
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -22,10 +22,12 @@ Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
 %{?perl_default_filter}
 
-%filter_from_provides /perl(Apache2::Connection)/d; /perl(Apache2::RequestRec)/d
+%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d
 
-%filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
 %filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d; /perl(Module::Build)/d
+%filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
+
+%filter_setup
 
 %description
 Mod_perl incorporates a Perl interpreter into the Apache web server,
@@ -139,6 +141,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_includedir}/httpd/*
 
 %changelog
+* Thu Nov 11 2010 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.4-13
+- fix missing requirements, add filter_setup macro, remove double provides
+
 * Sun Nov 04 2010 Emmanuel Seyman <emmanuel.seyman@club-internet.fr> - 2.0.4-12
 - Spec cleanup for the merge review
 
