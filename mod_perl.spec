@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.4
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -141,6 +141,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_includedir}/httpd/*
 
 %changelog
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.4-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Thu Nov 11 2010 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.4-13
 - fix missing requirements, add filter_setup macro, remove double provides
 
