@@ -1,8 +1,8 @@
 %global contentdir /var/www
 
 Name:           mod_perl
-Version:        2.0.4
-Release:        14%{?dist}
+Version:        2.0.5
+Release:        1%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -12,7 +12,6 @@ Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Patch0:         mod_perl-2.0.4-multilib.patch
 Patch1:         mod_perl-2.0.4-inline.patch
-Patch2:         mod_perl-2.0.4-CVE-2009-0796.patch
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
@@ -55,7 +54,6 @@ modules that use mod_perl.
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1 -b .inline
-%patch2 -p1
 
 
 %build
@@ -141,6 +139,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_includedir}/httpd/*
 
 %changelog
+* Sat Mar 26 2011 Joe Orton <jorton@redhat.com> - 2.0.5-1
+- update to 2.0.5
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.4-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
