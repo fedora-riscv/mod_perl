@@ -1,8 +1,8 @@
-%define contentdir /var/www
+%global contentdir /var/www
 
 Name:           mod_perl
-Version:        2.0.4
-Release:        10%{?dist}
+Version:        2.0.5
+Release:        1%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -10,12 +10,8 @@ License:        ASL 2.0
 URL:            http://perl.apache.org/
 Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
-Source2:        filter-requires.sh
-Source3:        filter-provides.sh
 Patch0:         mod_perl-2.0.4-multilib.patch
 Patch1:         mod_perl-2.0.4-inline.patch
-Patch2:         mod_perl-2.0.4-CVE-2009-0796.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
@@ -23,13 +19,19 @@ BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
-%define __perl_requires %{SOURCE2}
-%define __perl_provides %{SOURCE3}
+%{?perl_default_filter}
+
+%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d
+
+%filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d; /perl(Module::Build)/d
+%filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
+
+%filter_setup
 
 %description
 Mod_perl incorporates a Perl interpreter into the Apache web server,
 so that the Apache web server can directly execute Perl code.
-Mod_perl links the Perl runtime library into the Apache web server and
+Mod_perl links the Perl run-time library into the Apache web server and
 provides an object-oriented Perl interface for Apache's C language
 API.  The end result is a quicker CGI script turnaround process, since
 no external Perl interpreter has to be started.
@@ -52,14 +54,27 @@ modules that use mod_perl.
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1 -b .inline
-%patch2 -p1
+
 
 %build
+
+for i in Changes SVN-MOVE; do
+    iconv --from=ISO-8859-1 --to=UTF-8 $i > $i.utf8
+    mv $i.utf8 $i
+done
+
+cd docs
+for i in devel/debug/c.pod devel/core/explained.pod user/Changes.pod; do
+    iconv --from=ISO-8859-1 --to=UTF-8 $i > $i.utf8
+    mv $i.utf8 $i
+done
+cd ..
+
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
-	PREFIX=$RPM_BUILD_ROOT/usr \
-	INSTALLDIRS=vendor \
-	MP_APXS=%{_sbindir}/apxs \
-	MP_APR_CONFIG=%{_bindir}/apr-1-config
+        PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
+        INSTALLDIRS=vendor \
+        MP_APXS=%{_sbindir}/apxs \
+        MP_APR_CONFIG=%{_bindir}/apr-1-config
 make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 make
 
@@ -104,13 +119,6 @@ for m in $devmods; do
         echo %{perl_vendorarch}/auto/${fn}
 done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 
-# Completely remove Apache::Test - can be packaged separately
-#rm -rf $RPM_BUILD_ROOT%{_mandir}/man3/Apache::Test*
-#rm -rf $RPM_BUILD_ROOT%{perl_vendorarch}/Apache
-
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %files -f exclude.files
 %defattr(-,root,root,-)
@@ -131,6 +139,21 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/httpd/*
 
 %changelog
+* Sat Mar 26 2011 Joe Orton <jorton@redhat.com> - 2.0.5-1
+- update to 2.0.5
+
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.4-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Thu Nov 11 2010 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.4-13
+- fix missing requirements, add filter_setup macro, remove double provides
+
+* Sun Nov 04 2010 Emmanuel Seyman <emmanuel.seyman@club-internet.fr> - 2.0.4-12
+- Spec cleanup for the merge review
+
+* Fri May 14 2010 Marcela Maslanova <mmaslano@redhat.com> - 2.0.4-11
+- Mass rebuild with perl-5.12.0
+
 * Tue Dec  8 2009 Joe Orton <jorton@redhat.com> - 2.0.4-10
 - add security fix for CVE-2009-0796 (#544455)
 
