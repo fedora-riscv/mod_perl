@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -21,7 +21,7 @@ Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 
 %{?perl_default_filter}
 
-%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d
+%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d; /perl(warnings)$/d;
 
 %filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d; /perl(Module::Build)/d
 %filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
@@ -139,6 +139,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_includedir}/httpd/*
 
 %changelog
+* Mon Apr 11 2011 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.5-3
+- filter warnings from provides
+
 * Sat Mar 26 2011 Joe Orton <jorton@redhat.com> - 2.0.5-2
 - ship NOTICE file
 
