@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -139,6 +139,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_includedir}/httpd/*
 
 %changelog
+* Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.5-4
+- Perl mass rebuild
+
 * Mon Apr 11 2011 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.5-3
 - filter warnings from provides
 
