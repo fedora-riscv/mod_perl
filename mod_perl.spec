@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -12,6 +12,7 @@ Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Patch0:         mod_perl-2.0.4-multilib.patch
 Patch1:         mod_perl-2.0.4-inline.patch
+Patch2:         mod_perl-2.0.5-nolfs.patch
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
@@ -64,7 +65,7 @@ modules that use mod_perl.
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1 -b .inline
-
+%patch2 -p1
 
 %build
 
@@ -149,6 +150,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_includedir}/httpd/*
 
 %changelog
+* Wed Nov  9 2011 Joe Orton <jorton@redhat.com> - 2.0.5-6
+- fudge the LFS test (#730832)
+
 * Fri Jul 22 2011 Petr Pisar <ppisar@redhat.com> - 2.0.5-5
 - RPM 4.9 dependency filtering added
 
