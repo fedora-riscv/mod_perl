@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -19,13 +19,15 @@ BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
 BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
+# For Apache::SizeLimit::Core
+Requires:       perl(Linux::Pid)
 
 %{?perl_default_filter}
 
 # RPM 4.8 style
 %filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d; /perl(warnings)$/d;
 
-%filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d; /perl(Module::Build)/d
+%filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d
 %filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
 
 %filter_setup
@@ -35,7 +37,6 @@ Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
 %global __provides_exclude %__provides_exclude|perl\\(warnings\\)$
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Apache::Test.*\\)
 %global __requires_exclude %__requires_exclude|perl\\(Data::Flow\\)
-%global __requires_exclude %__requires_exclude|perl\\(Module::Build\\)
 %global __requires_exclude %__requires_exclude|perl\\(Apache2::FunctionTable\\)
 %global __requires_exclude %__requires_exclude|perl\\(Apache2::StructureTable\\)
 
@@ -117,7 +118,7 @@ devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
           ModPerl::TypeMap ModPerl::FunctionMap \
           ModPerl::ParseSource ModPerl::MM \
           Apache2::Build Apache2::ParseSource Apache2::BuildConfig \
-          Apache Bundle::ApacheTest"
+          Bundle::ApacheTest"
 for m in $devmods; do
    test -f $RPM_BUILD_ROOT%{_mandir}/man3/${m}.3pm &&
      echo "%{_mandir}/man3/${m}.3pm*"
@@ -129,6 +130,7 @@ for m in $devmods; do
    test -d $RPM_BUILD_ROOT%{perl_vendorarch}/auto/${fn} && 
         echo %{perl_vendorarch}/auto/${fn}
 done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
+echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 
 
 %files -f exclude.files
@@ -138,6 +140,9 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %{_bindir}/*
 %{_libdir}/httpd/modules/mod_perl.so
 %{perl_vendorarch}/auto/*
+%dir %{perl_vendorarch}/Apache/
+%{perl_vendorarch}/Apache/Reload.pm
+%{perl_vendorarch}/Apache/SizeLimit*
 %{perl_vendorarch}/Apache2/
 %{perl_vendorarch}/Bundle/
 %{perl_vendorarch}/APR/
@@ -148,8 +153,16 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 %files devel -f devel.files
 %defattr(-,root,root,-)
 %{_includedir}/httpd/*
+%{perl_vendorarch}/Apache/Test*.pm
+%{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Thu Jan  5 2012 Ville Skyttä <ville.skytta@iki.fi> - 2.0.5-7
+- Ship Apache::Reload and Apache::SizeLimit in main package (#748362).
+- Require Linux::Pid for Apache::SizeLimit (#766568).
+- Move Apache::Test* man pages to -devel.
+- Don't filter Module::Build dependency.
+
 * Wed Nov  9 2011 Joe Orton <jorton@redhat.com> - 2.0.5-6
 - fudge the LFS test (#730832)
 
@@ -298,7 +311,7 @@ done | tee devel.files | sed 's/^/%%exclude /' > exclude.files
 * Fri May 20 2005 Joe Orton <jorton@redhat.com> 2.0.0-1
 - update to 2.0.0 final
 
-* Mon Apr 18 2005 Ville Skyttä <ville.skytta at iki.fi> - 2.0.0-0.rc5.3
+* Mon Apr 18 2005 Ville Skyttä <ville.skytta@iki.fi> - 2.0.0-0.rc5.3
 - Fix sample configuration.
 - Explicitly disable the test suite. (#112563)
 
