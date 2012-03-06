@@ -2,7 +2,7 @@
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -13,6 +13,7 @@ Source1:        perl.conf
 Patch0:         mod_perl-2.0.4-multilib.patch
 Patch1:         mod_perl-2.0.4-inline.patch
 Patch2:         mod_perl-2.0.5-nolfs.patch
+Patch3:         mod_perl-short-name.patch
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
@@ -25,7 +26,7 @@ Requires:       perl(Linux::Pid)
 %{?perl_default_filter}
 
 # RPM 4.8 style
-%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d; /perl(warnings)$/d;
+%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d; /perl(warnings)$/d; /perl(HTTP::Request::Common)$/d;
 
 %filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d
 %filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
@@ -35,6 +36,7 @@ Requires:       perl(Linux::Pid)
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}perl\\(Apache2::Connection\\)$
 %global __provides_exclude %__provides_exclude|perl\\(Apache2::RequestRec\\)$
 %global __provides_exclude %__provides_exclude|perl\\(warnings\\)$
+%global __provides_exclude %__provides_exclude|perl\\(HTTP::Request::Common\\)$
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Apache::Test.*\\)
 %global __requires_exclude %__requires_exclude|perl\\(Data::Flow\\)
 %global __requires_exclude %__requires_exclude|perl\\(Apache2::FunctionTable\\)
@@ -67,6 +69,7 @@ modules that use mod_perl.
 %patch0 -p1
 %patch1 -p1 -b .inline
 %patch2 -p1
+%patch3 -p1 -b .short-name
 
 %build
 
@@ -157,6 +160,10 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Tue Mar 06 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.5-8
+- filter perl(HTTP::Request::Common) Provide from -devel (#247250)
+- use short_name as argv[0] (#782369)
+
 * Thu Jan  5 2012 Ville Skyttä <ville.skytta@iki.fi> - 2.0.5-7
 - Ship Apache::Reload and Apache::SizeLimit in main package (#748362).
 - Require Linux::Pid for Apache::SizeLimit (#766568).
