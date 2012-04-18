@@ -1,8 +1,10 @@
 %global contentdir /var/www
+%{!?_httpd_apxs: %{expand: %%global _httpd_apxs %%{_sbindir}/apxs}}
+%{!?_httpd_mmn: %{expand: %%global _httpd_mmn %%(cat %{_includedir}/httpd/.mmn || echo missing-httpd-devel)}}
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -10,16 +12,19 @@ License:        ASL 2.0
 URL:            http://perl.apache.org/
 Source0:        http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
+Source2:        perl.module.conf
 Patch0:         mod_perl-2.0.4-multilib.patch
 Patch1:         mod_perl-2.0.4-inline.patch
 Patch2:         mod_perl-2.0.5-nolfs.patch
 Patch3:         mod_perl-short-name.patch
+Patch4:         mod_perl-httpd24.patch
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
-BuildRequires:  httpd-devel >= 2.2.0, httpd, gdbm-devel
+BuildRequires:  httpd-devel >= 2.4.0, httpd, gdbm-devel
 BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
-Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Requires:       httpd-mmn = %(cat %{_includedir}/httpd/.mmn || echo missing)
+BuildRequires:  perl-Data-Dumper
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Requires:       httpd-mmn = %{_httpd_mmn}
 # For Apache::SizeLimit::Core
 Requires:       perl(Linux::Pid)
 
@@ -70,6 +75,7 @@ modules that use mod_perl.
 %patch1 -p1 -b .inline
 %patch2 -p1
 %patch3 -p1 -b .short-name
+%patch4 -p1
 
 %build
 
@@ -88,8 +94,9 @@ cd ..
 CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
         PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
         INSTALLDIRS=vendor \
-        MP_APXS=%{_sbindir}/apxs \
+        MP_APXS=%{_httpd_apxs} \
         MP_APR_CONFIG=%{_bindir}/apr-1-config
+
 make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 make
 
@@ -111,7 +118,9 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 # Install the config file
 install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
+install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d
 install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
+install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/02-perl.conf
 
 # Move set of modules to -devel
 devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
@@ -140,6 +149,7 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %defattr(-,root,root,-)
 %doc Changes LICENSE NOTICE README* STATUS SVN-MOVE docs/
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
 %{_bindir}/*
 %{_libdir}/httpd/modules/mod_perl.so
 %{perl_vendorarch}/auto/*
@@ -160,6 +170,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Wed Apr 18 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.5-9
+- fix compilation with httpd-2.4 (#809142)
+
 * Tue Mar 06 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.5-8
 - filter perl(HTTP::Request::Common) Provide from -devel (#247250)
 - use short_name as argv[0] (#782369)
