@@ -4,7 +4,7 @@
 
 Name:           mod_perl
 Version:        2.0.5
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -22,7 +22,7 @@ Patch4:         mod_perl-httpd24.patch
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.4.0, httpd, gdbm-devel
 BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
-BuildRequires:  perl-Data-Dumper
+BuildRequires:  perl(Data::Dumper)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %{_httpd_mmn}
 # For Apache::SizeLimit::Core
@@ -170,6 +170,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Thu Apr 19 2012 Petr Pisar <ppisar@redhat.com> - 2.0.5-10
+- Fix dependency declaration on Data::Dumper
+
 * Wed Apr 18 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.5-9
 - fix compilation with httpd-2.4 (#809142)
 
