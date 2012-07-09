@@ -4,7 +4,7 @@
 
 Name:           mod_perl
 Version:        2.0.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -183,6 +183,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Mon Jul 09 2012 Petr Pisar <ppisar@redhat.com> - 2.0.7-3
+- Rebuild to fix Apache2::MPM dependency on i686
+
 * Fri Jun 29 2012 Petr Pisar <ppisar@redhat.com> - 2.0.7-2
 - Perl 5.16 rebuild
 
