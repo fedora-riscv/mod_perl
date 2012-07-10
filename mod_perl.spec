@@ -4,7 +4,7 @@
 
 Name:           mod_perl
 Version:        2.0.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -32,14 +32,6 @@ Requires:       perl(Linux::Pid)
 
 %{?perl_default_filter}
 
-# RPM 4.8 style
-%filter_from_provides /perl(Apache2::Connection)$/d; /perl(Apache2::RequestRec)$/d; /perl(warnings)$/d; /perl(HTTP::Request::Common)$/d;
-
-%filter_from_requires /perl(Apache::Test.*)/d; /perl(Data::Flow)/d
-%filter_from_requires /perl(Apache2::FunctionTable)/d; /perl(Apache2::StructureTable)/d
-
-%filter_setup
-# RPM 4.9 style
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}perl\\(Apache2::Connection\\)$
 %global __provides_exclude %__provides_exclude|perl\\(Apache2::RequestRec\\)$
 %global __provides_exclude %__provides_exclude|perl\\(warnings\\)$
@@ -48,6 +40,9 @@ Requires:       perl(Linux::Pid)
 %global __requires_exclude %__requires_exclude|perl\\(Data::Flow\\)
 %global __requires_exclude %__requires_exclude|perl\\(Apache2::FunctionTable\\)
 %global __requires_exclude %__requires_exclude|perl\\(Apache2::StructureTable\\)
+
+# Hide dependencies on broken provides
+%global __requires_exclude %__requires_exclude|^perl\\(Apache2::MPM\\)
 
 %description
 Mod_perl incorporates a Perl interpreter into the Apache web server,
@@ -183,6 +178,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Tue Jul 10 2012 Petr Pisar <ppisar@redhat.com> - 2.0.7-5
+- Hide dependencies on broken provides
+
 * Mon Jul 09 2012 Petr Pisar <ppisar@redhat.com> - 2.0.7-4
 - Perl 5.16 rebuild
 
