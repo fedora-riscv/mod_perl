@@ -4,7 +4,7 @@
 
 Name:           mod_perl
 Version:        2.0.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -178,6 +178,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.7-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Tue Jul 10 2012 Petr Pisar <ppisar@redhat.com> - 2.0.7-5
 - Hide dependencies on broken provides
 
