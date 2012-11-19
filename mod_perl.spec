@@ -1,10 +1,13 @@
-%global contentdir /var/www
-%{!?_httpd_apxs: %{expand: %%global _httpd_apxs %%{_sbindir}/apxs}}
-%{!?_httpd_mmn: %{expand: %%global _httpd_mmn %%(cat %{_includedir}/httpd/.mmn || echo missing-httpd-devel)}}
+%{!?_httpd_apxs:       %{expand: %%global _httpd_apxs       %%{_sbindir}/apxs}}
+%{!?_httpd_mmn:        %{expand: %%global _httpd_mmn        %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo missing-httpd-devel)}}
+%{!?_httpd_confdir:    %{expand: %%global _httpd_confdir    %%{_sysconfdir}/httpd/conf.d}}
+# /etc/httpd/conf.d with httpd < 2.4 and defined as /etc/httpd/conf.modules.d with httpd >= 2.4
+%{!?_httpd_modconfdir: %{expand: %%global _httpd_modconfdir %%{_sysconfdir}/httpd/conf.d}}
+%{!?_httpd_moddir:    %{expand: %%global _httpd_moddir    %%{_libdir}/httpd/modules}}
 
 Name:           mod_perl
 Version:        2.0.7
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -60,7 +63,7 @@ like for it to directly incorporate a Perl interpreter.
 %package devel
 Summary:        Files needed for building XS modules that use mod_perl
 Group:          Development/Libraries
-Requires:       mod_perl = %{version}-%{release}, httpd-devel
+Requires:       %{name}%{?_isa} = %{version}-%{release}, httpd-devel%{?_isa}
 
 %description devel 
 The mod_perl-devel package contains the files needed for building XS
@@ -111,10 +114,9 @@ make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/httpd/modules
+install -d -m 755 $RPM_BUILD_ROOT%{_httpd_moddir}
 make install \
-    MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_libdir}/httpd/modules \
+    MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_httpd_moddir} \
     MODPERL_AP_INCLUDEDIR=$RPM_BUILD_ROOT%{_includedir}/httpd
 
 # Remove the temporary files.
@@ -127,15 +129,15 @@ find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
 chmod -R u+w $RPM_BUILD_ROOT/*
 
 # Install the config file
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
-install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d
-install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/02-perl.conf
+install -d -m 755 $RPM_BUILD_ROOT%{_httpd_confdir}
+install -d -m 755 $RPM_BUILD_ROOT%{_httpd_modconfdir}
+install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_httpd_confdir}
+install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_httpd_modconfdir}/02-perl.conf
 
 # Move set of modules to -devel
-devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
+devmods="ModPerl::BuildMM ModPerl::CScan \
           ModPerl::TestRun ModPerl::Config ModPerl::WrapXS \
-          ModPerl::BuildOptions ModPerl::Manifest \
+          ModPerl::Manifest \
           ModPerl::MapUtil ModPerl::StructureMap \
           ModPerl::TypeMap ModPerl::FunctionMap \
           ModPerl::ParseSource ModPerl::MM \
@@ -156,12 +158,11 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 
 
 %files -f exclude.files
-%defattr(-,root,root,-)
 %doc Changes LICENSE NOTICE README* STATUS SVN-MOVE docs/
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
+%config(noreplace) %{_httpd_confdir}/perl.conf
+%config(noreplace) %{_httpd_modconfdir}/02-perl.conf
 %{_bindir}/*
-%{_libdir}/httpd/modules/mod_perl.so
+%{_httpd_moddir}/mod_perl.so
 %{perl_vendorarch}/auto/*
 %dir %{perl_vendorarch}/Apache/
 %{perl_vendorarch}/Apache/Reload.pm
@@ -174,12 +175,15 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/*.3*
 
 %files devel -f devel.files
-%defattr(-,root,root,-)
 %{_includedir}/httpd/*
 %{perl_vendorarch}/Apache/Test*.pm
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Mon Nov 19 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.7-9
+- clean up spec file
+- do not require -devel when installing main package
+
 * Mon Nov 19 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.7-8
 - add wrappers for new fields added in httpd-2.4 structures
 
