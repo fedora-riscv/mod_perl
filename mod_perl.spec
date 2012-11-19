@@ -4,7 +4,7 @@
 
 Name:           mod_perl
 Version:        2.0.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -18,6 +18,7 @@ Patch1:         mod_perl-2.0.4-inline.patch
 Patch2:         mod_perl-2.0.5-nolfs.patch
 Patch3:         mod_perl-short-name.patch
 Patch4:         mod_perl-httpd24.patch
+Patch5:         mod_perl-httpd24-maps.patch
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.4.0, httpd, gdbm-devel
@@ -73,6 +74,7 @@ modules that use mod_perl.
 %patch2 -p1
 %patch3 -p1 -b .short-name
 %patch4 -p1
+%patch5 -p1 -b .maps
 
 %build
 
@@ -178,6 +180,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Mon Nov 19 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.7-8
+- add wrappers for new fields added in httpd-2.4 structures
+
 * Wed Jul 25 2012 Jan Kaluza <jkaluza@redhat.com> - 2.0.7-7
 - updated httpd-2.4 patch
 
