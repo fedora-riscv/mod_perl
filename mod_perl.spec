@@ -6,8 +6,8 @@
 %{!?_httpd_moddir:    %{expand: %%global _httpd_moddir    %%{_libdir}/httpd/modules}}
 
 Name:           mod_perl
-Version:        2.0.7
-Release:        12.20130221svn1448242%{?dist}
+Version:        2.0.8
+Release:        1.20130709svn1498417%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -15,14 +15,14 @@ License:        ASL 2.0
 URL:            http://perl.apache.org/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-#  svn export -r 1448242 https://svn.apache.org/repos/asf/perl/modperl/branches/httpd24 mod_perl-2.0.7-svn1448242
-#  tar czvf mod_perl-2.0.7-svn1448242.tar.gz mod_perl-2.0.7-svn1448242
-Source0:        mod_perl-2.0.7-svn1448242.tar.gz
+#  svn export -r 1498417 https://svn.apache.org/repos/asf/perl/modperl/branches/httpd24 mod_perl-2.0.8-svn1498417
+#  tar czvf mod_perl-2.0.8-svn1498417.tar.gz mod_perl-2.0.8-svn1498417
+Source0:        mod_perl-2.0.8-svn1498417.tar.gz
 #Source0:       http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
 Patch1:         mod_perl-2.0.4-inline.patch
-Patch2:         mod_perl-2.0.5-nolfs.patch
+#Patch2:         mod_perl-2.0.5-nolfs.patch
 #Patch3:         mod_perl-short-name.patch
 
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
@@ -75,9 +75,9 @@ modules that use mod_perl.
 
 
 %prep
-%setup -q -n %{name}-%{version}-svn1448242
+%setup -q -n %{name}-%{version}-svn1498417
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1
 #%patch3 -p1
 
 %build
@@ -185,6 +185,10 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Tue Jul 09 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-1.20130709svn1498417
+- update to latest revision of httpd24 branch to backport important fixes
+  in httpd-2.4 compatibility
+
 * Thu Feb 21 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.7-12.20130221svn1448242
 - update to httpd24 svn branch which provides much more better compatibility
   with httpd-2.4
