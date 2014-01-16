@@ -7,7 +7,7 @@
 
 Name:           mod_perl
 Version:        2.0.8
-Release:        4.20131031svn1537408%{?dist}
+Release:        5.20131031svn1537408%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -29,7 +29,7 @@ BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.4.0, httpd, gdbm-devel
 BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Data::Flow)
+#BuildRequires:  perl(Data::Flow)
 BuildRequires:  perl(Tie::IxHash)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %{_httpd_mmn}
@@ -185,7 +185,10 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
-* Thu Oct 21 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-3.20131031svn1537408
+* Thu Jan 16 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-5.20131031svn1537408
+- do not depend on perl-Data-Flow, it is not needed in newer versions
+
+* Thu Oct 21 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-4.20131031svn1537408
 - update to latest revision of httpd24 branch to backport new upstream fixes
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-3.20130709svn1498417
