@@ -5,6 +5,8 @@
 %{!?_httpd_modconfdir: %{expand: %%global _httpd_modconfdir %%{_sysconfdir}/httpd/conf.d}}
 %{!?_httpd_moddir:    %{expand: %%global _httpd_moddir    %%{_libdir}/httpd/modules}}
 
+%global regenerate_xs 0
+
 Name:           mod_perl
 Version:        2.0.8
 Release:        5.20131031svn1537408%{?dist}
@@ -18,7 +20,6 @@ URL:            http://perl.apache.org/
 #  svn export -r 1537408 https://svn.apache.org/repos/asf/perl/modperl/branches/httpd24 mod_perl-2.0.8-svn1537408
 #  tar czvf mod_perl-2.0.8-svn1537408.tar.gz mod_perl-2.0.8-svn1537408
 Source0:        mod_perl-2.0.8-svn1537408.tar.gz
-#Source0:       http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
 Patch1:         mod_perl-2.0.4-inline.patch
@@ -77,8 +78,6 @@ modules that use mod_perl.
 %prep
 %setup -q -n %{name}-%{version}-svn1537408
 %patch1 -p1
-#%patch2 -p1
-#%patch3 -p1
 
 %build
 
@@ -103,13 +102,15 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
 
 # This is not needed now when we are using httpd24 branch, but I will keep
 # it here in case someone will have to regenerate *.xs files again.
-#make source_scan
-#make xs_generate
-#CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
-#         PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
-#         INSTALLDIRS=vendor \
-#         MP_APXS=%{_httpd_apxs} \
-#         MP_APR_CONFIG=%{_bindir}/apr-1-config
+%if %{regenerate_xs}0
+make source_scan
+make xs_generate
+CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
+         PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
+         INSTALLDIRS=vendor \
+         MP_APXS=%{_httpd_apxs} \
+         MP_APR_CONFIG=%{_bindir}/apr-1-config
+%endif
 
 make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 make %{?_smp_mflags}
@@ -188,7 +189,7 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 * Thu Jan 23 2014 Joe Orton <jorton@redhat.com> - 2.0.8-5.20131031svn1537408
 - fix _httpd_mmn expansion in absence of httpd-devel
 
-* Thu Oct 21 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-3.20131031svn1537408
+* Mon Oct 21 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-3.20131031svn1537408
 - update to latest revision of httpd24 branch to backport new upstream fixes
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-3.20130709svn1498417
@@ -283,7 +284,7 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 * Thu Nov 11 2010 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.4-13
 - fix missing requirements, add filter_setup macro, remove double provides
 
-* Sun Nov 04 2010 Emmanuel Seyman <emmanuel.seyman@club-internet.fr> - 2.0.4-12
+* Thu Nov 04 2010 Emmanuel Seyman <emmanuel.seyman@club-internet.fr> - 2.0.4-12
 - Spec cleanup for the merge review
 
 * Fri May 14 2010 Marcela Maslanova <mmaslano@redhat.com> - 2.0.4-11
