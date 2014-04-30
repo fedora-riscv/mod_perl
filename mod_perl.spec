@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.8
-Release:        5.20131031svn1537408%{?dist}
+Release:        6.20140430svn1590627%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -17,9 +17,9 @@ License:        ASL 2.0
 URL:            http://perl.apache.org/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-#  svn export -r 1537408 https://svn.apache.org/repos/asf/perl/modperl/branches/httpd24 mod_perl-2.0.8-svn1537408
-#  tar czvf mod_perl-2.0.8-svn1537408.tar.gz mod_perl-2.0.8-svn1537408
-Source0:        mod_perl-2.0.8-svn1537408.tar.gz
+#  svn export -r 1590627 https://svn.apache.org/repos/asf/perl/modperl/branches/httpd24threading mod_perl-2.0.8-svn1590627
+#  tar czvf mod_perl-2.0.8-svn1590627.tar.gz mod_perl-2.0.8-svn1590627
+Source0:        mod_perl-2.0.8-svn1590627.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
 Patch1:         mod_perl-2.0.4-inline.patch
@@ -76,7 +76,7 @@ modules that use mod_perl.
 
 
 %prep
-%setup -q -n %{name}-%{version}-svn1537408
+%setup -q -n %{name}-%{version}-svn1590627
 %patch1 -p1
 
 %build
@@ -186,6 +186,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Wed Apr 30 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-6.20140430svn1590627
+- update to latest revision of httpd24threading branch to backport latest upstream fixes
+
 * Thu Jan 23 2014 Joe Orton <jorton@redhat.com> - 2.0.8-5.20131031svn1537408
 - fix _httpd_mmn expansion in absence of httpd-devel
 
