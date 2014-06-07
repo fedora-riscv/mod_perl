@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.8
-Release:        6.20140430svn1590627%{?dist}
+Release:        7.20140430svn1590627%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -186,6 +186,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-7.20140430svn1590627
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Wed Apr 30 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-6.20140430svn1590627
 - update to latest revision of httpd24threading branch to backport latest upstream fixes
 
