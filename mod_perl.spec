@@ -1,13 +1,15 @@
 %{!?_httpd_apxs:       %{expand: %%global _httpd_apxs       %%{_sbindir}/apxs}}
-%{!?_httpd_mmn:        %{expand: %%global _httpd_mmn        %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo missing-httpd-devel)}}
+%{!?_httpd_mmn:        %{expand: %%global _httpd_mmn        %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}}
 %{!?_httpd_confdir:    %{expand: %%global _httpd_confdir    %%{_sysconfdir}/httpd/conf.d}}
 # /etc/httpd/conf.d with httpd < 2.4 and defined as /etc/httpd/conf.modules.d with httpd >= 2.4
 %{!?_httpd_modconfdir: %{expand: %%global _httpd_modconfdir %%{_sysconfdir}/httpd/conf.d}}
 %{!?_httpd_moddir:    %{expand: %%global _httpd_moddir    %%{_libdir}/httpd/modules}}
 
+%global regenerate_xs 0
+
 Name:           mod_perl
 Version:        2.0.8
-Release:        5.20131031svn1537408%{?dist}
+Release:        10.20140624svn1602105%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -15,10 +17,9 @@ License:        ASL 2.0
 URL:            http://perl.apache.org/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-#  svn export -r 1537408 https://svn.apache.org/repos/asf/perl/modperl/branches/httpd24 mod_perl-2.0.8-svn1537408
-#  tar czvf mod_perl-2.0.8-svn1537408.tar.gz mod_perl-2.0.8-svn1537408
-Source0:        mod_perl-2.0.8-svn1537408.tar.gz
-#Source0:       http://perl.apache.org/dist/mod_perl-%{version}.tar.gz
+#  svn export -r 1602105 https://svn.apache.org/repos/asf/perl/modperl/trunk mod_perl-2.0.8-svn1602105
+#  tar czvf mod_perl-2.0.8-svn1602105.tar.gz mod_perl-2.0.8-svn1602105
+Source0:        mod_perl-2.0.8-svn1602105.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
 Patch1:         mod_perl-2.0.4-inline.patch
@@ -75,10 +76,8 @@ modules that use mod_perl.
 
 
 %prep
-%setup -q -n %{name}-%{version}-svn1537408
+%setup -q -n %{name}-%{version}-svn1602105
 %patch1 -p1
-#%patch2 -p1
-#%patch3 -p1
 
 %build
 
@@ -103,13 +102,15 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
 
 # This is not needed now when we are using httpd24 branch, but I will keep
 # it here in case someone will have to regenerate *.xs files again.
-#make source_scan
-#make xs_generate
-#CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
-#         PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
-#         INSTALLDIRS=vendor \
-#         MP_APXS=%{_httpd_apxs} \
-#         MP_APR_CONFIG=%{_bindir}/apr-1-config
+%if %{regenerate_xs}0
+make source_scan
+make xs_generate
+CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
+         PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
+         INSTALLDIRS=vendor \
+         MP_APXS=%{_httpd_apxs} \
+         MP_APR_CONFIG=%{_bindir}/apr-1-config
+%endif
 
 make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
 make %{?_smp_mflags}
@@ -185,6 +186,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Wed Sep 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-10.20140624svn1602105
+- update to latest revision of httpd24threading branch to backport latest upstream fixes
+
 * Thu Jan 16 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-5.20131031svn1537408
 - do not depend on perl-Data-Flow, it is not needed in newer versions
 
@@ -283,7 +287,7 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 * Thu Nov 11 2010 Marcela Mašláňová <mmaslano@redhat.com> - 2.0.4-13
 - fix missing requirements, add filter_setup macro, remove double provides
 
-* Sun Nov 04 2010 Emmanuel Seyman <emmanuel.seyman@club-internet.fr> - 2.0.4-12
+* Thu Nov 04 2010 Emmanuel Seyman <emmanuel.seyman@club-internet.fr> - 2.0.4-12
 - Spec cleanup for the merge review
 
 * Fri May 14 2010 Marcela Maslanova <mmaslano@redhat.com> - 2.0.4-11
