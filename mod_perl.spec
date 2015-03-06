@@ -189,7 +189,7 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
-* Fri Mar 06 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-11.20140624svn1602105
+* Fri Mar 06 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-11.20140624svn1602105
 - remove docs/os from documentation because of its license (#1199044)
 
 * Wed Aug 27 2014 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.8-10.20140624svn1602105
