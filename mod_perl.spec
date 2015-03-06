@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.8
-Release:        10.20140624svn1602105%{?dist}
+Release:        11.20140624svn1602105%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -78,6 +78,9 @@ modules that use mod_perl.
 %prep
 %setup -q -n %{name}-%{version}-svn1602105
 %patch1 -p1
+
+# Remove docs/os. It's only win32 info with non ASL-2.0 license.
+rm -rf docs/os
 
 %build
 
@@ -186,6 +189,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Fri Mar 06 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-11.20140624svn1602105
+- remove docs/os from documentation because of its license (#1199044)
+
 * Wed Aug 27 2014 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.8-10.20140624svn1602105
 - Perl 5.20 rebuild
 
