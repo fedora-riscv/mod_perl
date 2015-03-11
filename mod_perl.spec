@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.8
-Release:        11.20140624svn1602105%{?dist}
+Release:        12.20150311svn1665777%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -17,9 +17,9 @@ License:        ASL 2.0
 URL:            http://perl.apache.org/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-#  svn export -r 1602105 https://svn.apache.org/repos/asf/perl/modperl/trunk mod_perl-2.0.8-svn1602105
-#  tar czvf mod_perl-2.0.8-svn1602105.tar.gz mod_perl-2.0.8-svn1602105
-Source0:        mod_perl-2.0.8-svn1602105.tar.gz
+#  svn export -r 1665777 https://svn.apache.org/repos/asf/perl/modperl/trunk mod_perl-2.0.8-svn1665777
+#  tar czvf mod_perl-2.0.8-svn1665777.tar.gz mod_perl-2.0.8-svn1665777
+Source0:        mod_perl-2.0.8-svn1665777.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
 Patch1:         mod_perl-2.0.4-inline.patch
@@ -76,7 +76,7 @@ modules that use mod_perl.
 
 
 %prep
-%setup -q -n %{name}-%{version}-svn1602105
+%setup -q -n %{name}-%{version}-svn1665777
 %patch1 -p1
 
 # Remove docs/os. It's only win32 info with non ASL-2.0 license.
@@ -189,6 +189,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Wed Mar 11 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-12.20150311svn1665777
+- update to latest revision from trunk to backport latest upstream fixes
+
 * Fri Mar 06 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-11.20140624svn1602105
 - remove docs/os from documentation because of its license (#1199044)
 
