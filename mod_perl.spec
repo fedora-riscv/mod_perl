@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.8
-Release:        12.20150311svn1665777%{?dist}
+Release:        13.20150311svn1665777%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -189,6 +189,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Thu Jun 04 2015 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.8-13.20150311svn1665777
+- Perl 5.22 rebuild
+
 * Wed Mar 11 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-12.20150311svn1665777
 - update to latest revision from trunk to backport latest upstream fixes
 
