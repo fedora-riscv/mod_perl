@@ -8,18 +8,14 @@
 %global regenerate_xs 0
 
 Name:           mod_perl
-Version:        2.0.8
-Release:        12.20150311svn1665777%{?dist}
+Version:        2.0.9
+Release:        1%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
 License:        ASL 2.0
 URL:            http://perl.apache.org/
-# The source for this package was pulled from upstream's vcs.  Use the
-# following commands to generate the tarball:
-#  svn export -r 1665777 https://svn.apache.org/repos/asf/perl/modperl/trunk mod_perl-2.0.8-svn1665777
-#  tar czvf mod_perl-2.0.8-svn1665777.tar.gz mod_perl-2.0.8-svn1665777
-Source0:        mod_perl-2.0.8-svn1665777.tar.gz
+Source0:        http://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
 Patch1:         mod_perl-2.0.4-inline.patch
@@ -76,7 +72,7 @@ modules that use mod_perl.
 
 
 %prep
-%setup -q -n %{name}-%{version}-svn1665777
+%setup -q
 %patch1 -p1
 
 # Remove docs/os. It's only win32 info with non ASL-2.0 license.
@@ -185,10 +181,12 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %files devel -f devel.files
 %{_includedir}/httpd/*
 %{perl_vendorarch}/Apache/Test*.pm
-%{perl_vendorarch}/MyTest
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Fri Jun 19 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.9-1
+- update to 2.0.9
+
 * Wed Mar 11 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-12.20150311svn1665777
 - update to latest revision from trunk to backport latest upstream fixes
 
