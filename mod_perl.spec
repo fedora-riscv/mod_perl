@@ -187,6 +187,12 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 * Fri Jun 19 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.9-1
 - update to 2.0.9
 
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-14.20150311svn1665777
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Thu Jun 04 2015 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.8-13.20150311svn1665777
+- Perl 5.22 rebuild
+
 * Wed Mar 11 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-12.20150311svn1665777
 - update to latest revision from trunk to backport latest upstream fixes
 
