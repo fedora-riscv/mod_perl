@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -152,6 +152,24 @@ The mod_perl-devel package contains the files needed for building XS
 modules that use mod_perl.
 
 
+%package -n perl-Apache-Reload
+Version:        0.13
+Summary:        Reload changed Perl modules
+License:        ASL 2.0
+Group:          Development/Libraries
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# The mod_perl2 1.99022 is not used, pick for example ModPerl::Util to
+# constrain the version.
+Requires:       perl(ModPerl::Util) >= 1.99022
+Conflicts:      mod_perl < 2.0.10-3
+
+# Fiter-underspecified dependencies
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(ModPerl::Util\\)$
+
+%description -n perl-Apache-Reload
+This mod_perl extension allows to reload Perl modules that changed on the disk.
+
+
 %prep
 %setup -q
 %patch0 -p1
@@ -254,21 +272,36 @@ fi
 %{_httpd_moddir}/mod_perl.so
 %{perl_vendorarch}/auto/*
 %dir %{perl_vendorarch}/Apache/
-%{perl_vendorarch}/Apache/Reload.pm
 %{perl_vendorarch}/Apache/SizeLimit*
 %{perl_vendorarch}/Apache2/
+%exclude %{perl_vendorarch}/Apache2/Reload.pm
 %{perl_vendorarch}/Bundle/
 %{perl_vendorarch}/APR/
 %{perl_vendorarch}/ModPerl/
 %{perl_vendorarch}/*.pm
 %{_mandir}/man3/*.3*
+%exclude %{_mandir}/man3/Apache::Reload.3pm*
+%exclude %{_mandir}/man3/Apache2::Reload.3pm*
 
 %files devel -f devel.files
 %{_includedir}/httpd/*
 %{perl_vendorarch}/Apache/Test*.pm
 %{_mandir}/man3/Apache::Test*.3pm*
 
+%files -n perl-Apache-Reload
+%dir %{perl_vendorarch}/Apache/
+%{perl_vendorarch}/Apache/Reload.pm
+%dir %{perl_vendorarch}/Apache2/
+%{perl_vendorarch}/Apache2/Reload.pm
+%{_mandir}/man3/Apache::Reload.3pm*
+%{_mandir}/man3/Apache2::Reload.3pm*
+
+
 %changelog
+* Fri Mar 24 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-4
+- Sub-package Apache::Reload and Apache2::Reload into perl-Apache-Reload
+  (bug #1225037)
+
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.10-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
