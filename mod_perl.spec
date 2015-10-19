@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 
 Group:          System Environment/Daemons
@@ -28,6 +28,7 @@ BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 BuildRequires:  perl(Data::Dumper)
 #BuildRequires:  perl(Data::Flow)
 BuildRequires:  perl(Tie::IxHash)
+BuildRequires:  perl(Test)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       httpd-mmn = %{_httpd_mmn}
 # For Apache::SizeLimit::Core
@@ -184,6 +185,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Mon Oct 19 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.9-2
+- fix #1272901 - add perl(Test) to BuildRequires
+
 * Fri Jun 19 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.9-1
 - update to 2.0.9
 
