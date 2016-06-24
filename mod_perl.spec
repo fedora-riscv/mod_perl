@@ -22,7 +22,7 @@ Patch1:         mod_perl-2.0.4-inline.patch
 #Patch2:         mod_perl-2.0.5-nolfs.patch
 #Patch3:         mod_perl-short-name.patch
 
-BuildRequires:  perl-devel, perl(ExtUtils::Embed)
+BuildRequires:  perl-devel, perl-generators, perl(ExtUtils::Embed)
 BuildRequires:  httpd-devel >= 2.4.0, httpd, gdbm-devel
 BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
 BuildRequires:  perl(Data::Dumper)
