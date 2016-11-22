@@ -8,29 +8,72 @@
 %global regenerate_xs 0
 
 Name:           mod_perl
-Version:        2.0.9
-Release:        2%{?dist}
+Version:        2.0.10
+Release:        1%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
-
-Group:          System Environment/Daemons
+# other files:                  ASL 2.0
+## Not in binary packages
+# docs/os/win32/distinstall:    GPL+ or Artistic
+# docs/os/win32/mpinstall:      GPL+ or Artistic
 License:        ASL 2.0
+Group:          System Environment/Daemons
 URL:            http://perl.apache.org/
 Source0:        http://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
 Source2:        perl.module.conf
+# Normalize documentation encoding
+Patch0:         mod_perl-2.0.10-Convert-documentation-to-UTF-8.patch
 Patch1:         mod_perl-2.0.4-inline.patch
 #Patch2:         mod_perl-2.0.5-nolfs.patch
 #Patch3:         mod_perl-short-name.patch
-
-BuildRequires:  perl-devel, perl-generators, perl(ExtUtils::Embed)
-BuildRequires:  httpd-devel >= 2.4.0, httpd, gdbm-devel
-BuildRequires:  apr-devel >= 1.2.0, apr-util-devel
+BuildRequires:  apr-devel >= 1.2.0
+BuildRequires:  apr-util-devel
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  gdbm-devel
+BuildRequires:  httpd
+BuildRequires:  httpd-devel >= 2.4.0
+BuildRequires:  make
+BuildRequires:  perl
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl(AutoLoader)
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Data::Flow)
-BuildRequires:  perl(Tie::IxHash)
+BuildRequires:  perl(DirHandle)
+BuildRequires:  perl(DynaLoader)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::Embed)
+BuildRequires:  perl(ExtUtils::Install)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(File::Basename)
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(File::Find)
+BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::Spec::Functions)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(lib)
+# Module::CoreList not helpful
+BuildRequires:  perl(strict)
+BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Test)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+# Win32 not used
+%if %{regenerate_xs}0
+BuildRequires:  perl(Data::Flow) >= 0.05
+BuildRequires:  perl(Tie::IxHash)
+%endif
+# Optional tests:
+BuildRequires:  perl(Test::More)
+BuildRequires:  sed
 Requires:       httpd-mmn = %{_httpd_mmn}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # For Apache::SizeLimit::Core
 Requires:       perl(Linux::Pid)
 
@@ -65,7 +108,8 @@ like for it to directly incorporate a Perl interpreter.
 %package devel
 Summary:        Files needed for building XS modules that use mod_perl
 Group:          Development/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}, httpd-devel%{?_isa}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       httpd-devel%{?_isa}
 
 %description devel 
 The mod_perl-devel package contains the files needed for building XS
@@ -74,27 +118,13 @@ modules that use mod_perl.
 
 %prep
 %setup -q
+%patch0 -p1
 %patch1 -p1
-
-# Remove docs/os. It's only win32 info with non ASL-2.0 license.
+# Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 
 %build
-
-for i in Changes SVN-MOVE; do
-    iconv --from=ISO-8859-1 --to=UTF-8 $i > $i.utf8
-    mv $i.utf8 $i
-done
-
-cd docs
-for i in devel/debug/c.pod devel/core/explained.pod user/Changes.pod; do
-    iconv --from=ISO-8859-1 --to=UTF-8 $i > $i.utf8
-    mv $i.utf8 $i
-done
-cd ..
-
-
-CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
+CFLAGS="$RPM_OPT_FLAGS -fpic" perl Makefile.PL </dev/null \
          PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
          INSTALLDIRS=vendor \
          MP_APXS=%{_httpd_apxs} \
@@ -105,7 +135,7 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
 %if %{regenerate_xs}0
 make source_scan
 make xs_generate
-CFLAGS="$RPM_OPT_FLAGS -fpic" %{__perl} Makefile.PL </dev/null \
+CFLAGS="$RPM_OPT_FLAGS -fpic" perl Makefile.PL </dev/null \
          PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
          INSTALLDIRS=vendor \
          MP_APXS=%{_httpd_apxs} \
@@ -121,14 +151,15 @@ make install \
     MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_httpd_moddir} \
     MODPERL_AP_INCLUDEDIR=$RPM_BUILD_ROOT%{_includedir}/httpd
 
-# Remove the temporary files.
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type f -name perllocal.pod -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type f -name '*.bs' -a -size 0 -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
+# Remove files not suitable for distribution.
+find $RPM_BUILD_ROOT -type f -name .packlist -delete
+find $RPM_BUILD_ROOT -type f -name perllocal.pod -delete
+find $RPM_BUILD_ROOT -type f -name '*.bs' -a -size 0 -delete
+# Remove empty vendor_perl/auto/mod_perl2 directory.
+find $RPM_BUILD_ROOT -depth -type d -empty -delete
 
 # Fix permissions to avoid strip failures on non-root builds.
-chmod -R u+w $RPM_BUILD_ROOT/*
+%{_fixperms} $RPM_BUILD_ROOT/*
 
 # Install the config file
 install -d -m 755 $RPM_BUILD_ROOT%{_httpd_confdir}
@@ -160,10 +191,11 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 
 # perl build script generates *.orig files, they get installed and later they
 # break provides so mod_perl requires mod_perl-devel. We remove them here.
-find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
+find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 
 %files -f exclude.files
-%doc Changes LICENSE NOTICE README* STATUS SVN-MOVE docs/
+%license LICENSE
+%doc Changes NOTICE README* STATUS SVN-MOVE docs/
 %config(noreplace) %{_httpd_confdir}/perl.conf
 %config(noreplace) %{_httpd_modconfdir}/02-perl.conf
 %{_bindir}/*
@@ -185,6 +217,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Tue Nov 22 2016 Petr Pisar <ppisar@redhat.com> - 2.0.10-1
+- 2.0.10 bump
+
 * Mon Oct 19 2015 Jan Kaluza <jkaluza@redhat.com> - 2.0.9-2
 - fix #1272901 - add perl(Test) to BuildRequires
 
