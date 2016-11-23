@@ -24,8 +24,10 @@ Source2:        perl.module.conf
 # Normalize documentation encoding
 Patch0:         mod_perl-2.0.10-Convert-documentation-to-UTF-8.patch
 Patch1:         mod_perl-2.0.4-inline.patch
-#Patch2:         mod_perl-2.0.5-nolfs.patch
-#Patch3:         mod_perl-short-name.patch
+# Fix a random deadlock in t/filter/in_str_declined.t, CPAN RT#82409
+Patch2:         mod_perl-2.0.7-fix_pipelines_reponse_deadlock_in_tests.patch
+#Patch3:         mod_perl-2.0.5-nolfs.patch
+#Patch4:         mod_perl-short-name.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
@@ -150,6 +152,7 @@ modules that use mod_perl.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove a failing test that's not a regression, CPAN RT#118919
