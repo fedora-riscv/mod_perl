@@ -230,7 +230,11 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 
 %check
-make test
+make test TEST_VERBOSE=1 && RETVAL=$?
+if test "$RETVAL" != 0; then
+    cat t/logs/error_log
+    exit 1
+fi
 
 %files -f exclude.files
 %license LICENSE
