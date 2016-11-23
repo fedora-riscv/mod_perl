@@ -97,6 +97,8 @@ BuildRequires:  perl(threads)
 BuildRequires:  perl(Test::More)
 # Optional tests:
 BuildRequires:  perl(CGI) >= 2.93
+BuildRequires:  perl(HTTP::Request::Common)
+BuildRequires:  perl(LWP::UserAgent)
 Requires:       httpd-mmn = %{_httpd_mmn}
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # For Apache::SizeLimit::Core
