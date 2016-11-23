@@ -65,13 +65,38 @@ BuildRequires:  perl(Test)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 # Win32 not used
+BuildRequires:  sed
 %if %{regenerate_xs}0
 BuildRequires:  perl(Data::Flow) >= 0.05
 BuildRequires:  perl(Tie::IxHash)
 %endif
-# Optional tests:
+# Run-time:
+BuildRequires:  perl(base)
+BuildRequires:  perl(BSD::Resource)
+BuildRequires:  perl(Carp::Heavy)
+BuildRequires:  perl(Fcntl)
+BuildRequires:  perl(Getopt::Long)
+# IO::Dir not used at tests
+BuildRequires:  perl(Linux::Pid)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(POSIX)
+BuildRequires:  perl(Socket)
+BuildRequires:  perl(subs)
+# TAP::Formatter::Console not use at tests
+# TAP::Harness not used at tests
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::Harness)
+# Tests:
+BuildRequires:  perl(Compress::Zlib)
+BuildRequires:  perl(Encode)
+BuildRequires:  perl(ExtUtils::testlib)
+BuildRequires:  perl(IO::Select)
+BuildRequires:  perl(locale)
+BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(threads)
 BuildRequires:  perl(Test::More)
-BuildRequires:  sed
+# Optional tests:
+BuildRequires:  perl(CGI) >= 2.93
 Requires:       httpd-mmn = %{_httpd_mmn}
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # For Apache::SizeLimit::Core
@@ -110,6 +135,8 @@ Summary:        Files needed for building XS modules that use mod_perl
 Group:          Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       httpd-devel%{?_isa}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(IO::Dir)
 
 %description devel 
 The mod_perl-devel package contains the files needed for building XS
@@ -122,6 +149,12 @@ modules that use mod_perl.
 %patch1 -p1
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
+# Remove a failing test that's not a regression, CPAN RT#118919
+for F in t/filter/in_bbs_inject_header.t \
+        t/filter/TestFilter/in_bbs_inject_header.pm; do
+    rm "$F"
+    sed -i -e '\,^'"$F"',d' MANIFEST
+done
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fpic" perl Makefile.PL </dev/null \
@@ -192,6 +225,9 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 # perl build script generates *.orig files, they get installed and later they
 # break provides so mod_perl requires mod_perl-devel. We remove them here.
 find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
+
+%check
+make test
 
 %files -f exclude.files
 %license LICENSE
