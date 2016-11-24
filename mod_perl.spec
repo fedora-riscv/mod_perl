@@ -192,7 +192,7 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -exec rm -f {} \;
 * Thu Jan 16 2014 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-5.20131031svn1537408
 - do not depend on perl-Data-Flow, it is not needed in newer versions
 
-* Thu Oct 21 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-4.20131031svn1537408
+* Thu Oct 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.0.8-4.20131031svn1537408
 - update to latest revision of httpd24 branch to backport new upstream fixes
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-3.20130709svn1498417
