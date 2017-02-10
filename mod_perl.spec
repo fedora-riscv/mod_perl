@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -269,6 +269,9 @@ fi
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Wed Jan 04 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-2
 - Adapt tests to httpd-2.4.25 (bug #1409610)
 
