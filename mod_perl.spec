@@ -161,7 +161,7 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # The mod_perl2 1.99022 is not used, pick for example ModPerl::Util to
 # constrain the version.
 Requires:       perl(ModPerl::Util) >= 1.99022
-Conflicts:      mod_perl < 2.0.10-3
+Conflicts:      mod_perl < 2.0.10-4
 
 # Fiter-underspecified dependencies
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(ModPerl::Util\\)$
