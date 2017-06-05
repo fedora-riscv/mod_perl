@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -298,6 +298,9 @@ fi
 
 
 %changelog
+* Mon Jun 05 2017 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.10-5
+- Perl 5.26 rebuild
+
 * Fri Mar 24 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-4
 - Sub-package Apache::Reload and Apache2::Reload into perl-Apache-Reload
   (bug #1225037)
