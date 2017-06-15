@@ -1,3 +1,6 @@
+# Unbundle Apache-Reload
+%{bcond_with mod_perl_enables_bundled_Apache_Reload}
+
 %{!?_httpd_apxs:       %{expand: %%global _httpd_apxs       %%{_sbindir}/apxs}}
 %{!?_httpd_mmn:        %{expand: %%global _httpd_mmn        %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}}
 %{!?_httpd_confdir:    %{expand: %%global _httpd_confdir    %%{_sysconfdir}/httpd/conf.d}}
@@ -9,7 +12,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -152,6 +155,7 @@ The mod_perl-devel package contains the files needed for building XS
 modules that use mod_perl.
 
 
+%if %{with mod_perl_enables_bundled_Apache_Reload}
 %package -n perl-Apache-Reload
 Version:        0.13
 Summary:        Reload changed Perl modules
@@ -162,12 +166,14 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # constrain the version.
 Requires:       perl(ModPerl::Util) >= 1.99022
 Conflicts:      mod_perl < 2.0.10-4
+Provides:       bundled(Apache-Reload) = %{version}
 
 # Fiter-underspecified dependencies
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(ModPerl::Util\\)$
 
 %description -n perl-Apache-Reload
 This mod_perl extension allows to reload Perl modules that changed on the disk.
+%endif
 
 
 %prep
@@ -179,6 +185,11 @@ This mod_perl extension allows to reload Perl modules that changed on the disk.
 %patch4 -p1
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
+# Remove bundled Apache-Reload
+%if %{without mod_perl_enables_bundled_Apache_Reload}
+rm -rf Apache-Reload
+sed -i -e '/Apache-Reload/d' Makefile.PL MANIFEST
+%endif
 # Remove a failing test that's not a regression, CPAN RT#118919
 for F in t/filter/in_bbs_inject_header.t \
         t/filter/TestFilter/in_bbs_inject_header.pm; do
@@ -288,6 +299,7 @@ fi
 %{perl_vendorarch}/Apache/Test*.pm
 %{_mandir}/man3/Apache::Test*.3pm*
 
+%if %{with mod_perl_enables_bundled_Apache_Reload}
 %files -n perl-Apache-Reload
 %dir %{perl_vendorarch}/Apache/
 %{perl_vendorarch}/Apache/Reload.pm
@@ -295,9 +307,13 @@ fi
 %{perl_vendorarch}/Apache2/Reload.pm
 %{_mandir}/man3/Apache::Reload.3pm*
 %{_mandir}/man3/Apache2::Reload.3pm*
+%endif
 
 
 %changelog
+* Thu Jun 15 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-6
+- Remove bundled Apache-Reload (bug #1225037)
+
 * Mon Jun 05 2017 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.10-5
 - Perl 5.26 rebuild
 
