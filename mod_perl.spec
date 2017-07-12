@@ -44,7 +44,7 @@ BuildRequires:  gdbm-devel
 BuildRequires:  httpd
 BuildRequires:  httpd-devel >= 2.4.0
 BuildRequires:  make
-BuildRequires:  perl
+BuildRequires:  perl-interpreter
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl(AutoLoader)
