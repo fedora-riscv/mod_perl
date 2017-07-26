@@ -12,7 +12,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -311,6 +311,9 @@ fi
 
 
 %changelog
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
 * Thu Jun 15 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-6
 - Remove bundled Apache-Reload (bug #1225037)
 
