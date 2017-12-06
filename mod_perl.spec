@@ -1,5 +1,7 @@
 # Unbundle Apache-Reload
 %{bcond_with mod_perl_enables_bundled_Apache_Reload}
+# Run optional test
+%{bcond_without mod_perl_enables_optional_test}
 
 %{!?_httpd_apxs:       %{expand: %%global _httpd_apxs       %%{_sbindir}/apxs}}
 %{!?_httpd_mmn:        %{expand: %%global _httpd_mmn        %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}}
@@ -105,10 +107,12 @@ BuildRequires:  perl(locale)
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(threads)
 BuildRequires:  perl(Test::More)
+%if %{with mod_perl_enables_optional_test}
 # Optional tests:
 BuildRequires:  perl(CGI) >= 2.93
 BuildRequires:  perl(HTTP::Request::Common)
 BuildRequires:  perl(LWP::UserAgent)
+%endif
 Requires:       httpd-mmn = %{_httpd_mmn}
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # For Apache::SizeLimit::Core
