@@ -33,7 +33,7 @@ Patch4:         mod_perl-2.0.10-inject_header_line_terminators.patch
 #Patch3:         mod_perl-2.0.5-nolfs.patch
 #Patch4:         mod_perl-short-name.patch
 # Fix CVE-2011-2767 (arbitrary Perl code execution in the context of the user
-# account via a user-owned .htaccess), bug #1623267, CPAN RT#126984
+# account via a user-owned .htaccess), bug #1623268, CPAN RT#126984
 Patch5:         mod_perl-2.0.10-restrict_perl_section_to_server_scope.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
@@ -274,7 +274,7 @@ fi
 %changelog
 * Wed Aug 29 2018 Petr Pisar <ppisar@redhat.com> - 2.0.10-3
 - Fix CVE-2011-2767 (arbitrary Perl code execution in the context of the user
-  account via a user-owned .htaccess) (bug #1623267)
+  account via a user-owned .htaccess) (bug #1623268)
 
 * Wed Jan 04 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-2
 - Adapt tests to httpd-2.4.25 (bug #1409610)
