@@ -9,7 +9,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -32,6 +32,9 @@ Patch3:         mod_perl-2.0.10-http_syntax.patch
 Patch4:         mod_perl-2.0.10-inject_header_line_terminators.patch
 #Patch3:         mod_perl-2.0.5-nolfs.patch
 #Patch4:         mod_perl-short-name.patch
+# Fix CVE-2011-2767 (arbitrary Perl code execution in the context of the user
+# account via a user-owned .htaccess), bug #1623267, CPAN RT#126984
+Patch5:         mod_perl-2.0.10-restrict_perl_section_to_server_scope.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
@@ -158,6 +161,7 @@ modules that use mod_perl.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove a failing test that's not a regression, CPAN RT#118919
@@ -268,6 +272,10 @@ fi
 %{_mandir}/man3/Apache::Test*.3pm*
 
 %changelog
+* Wed Aug 29 2018 Petr Pisar <ppisar@redhat.com> - 2.0.10-3
+- Fix CVE-2011-2767 (arbitrary Perl code execution in the context of the user
+  account via a user-owned .htaccess) (bug #1623267)
+
 * Wed Jan 04 2017 Petr Pisar <ppisar@redhat.com> - 2.0.10-2
 - Adapt tests to httpd-2.4.25 (bug #1409610)
 
