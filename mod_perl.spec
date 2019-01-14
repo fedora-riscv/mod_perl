@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -319,6 +319,9 @@ fi
 
 
 %changelog
+* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.0.10-14
+- Rebuilt for libcrypt.so.2 (#1666033)
+
 * Wed Aug 29 2018 Petr Pisar <ppisar@redhat.com> - 2.0.10-13
 - Fix CVE-2011-2767 (arbitrary Perl code execution in the context of the user
   account via a user-owned .htaccess) (bug #1623267)
