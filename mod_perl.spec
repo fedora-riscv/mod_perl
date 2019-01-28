@@ -21,7 +21,6 @@ Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # docs/os/win32/distinstall:    GPL+ or Artistic
 # docs/os/win32/mpinstall:      GPL+ or Artistic
 License:        ASL 2.0
-Group:          System Environment/Daemons
 URL:            http://perl.apache.org/
 Source0:        http://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz
 Source1:        perl.conf
@@ -151,7 +150,6 @@ like for it to directly incorporate a Perl interpreter.
 
 %package devel
 Summary:        Files needed for building XS modules that use mod_perl
-Group:          Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       httpd-devel%{?_isa}
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -167,7 +165,6 @@ modules that use mod_perl.
 Version:        0.13
 Summary:        Reload changed Perl modules
 License:        ASL 2.0
-Group:          Development/Libraries
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # The mod_perl2 1.99022 is not used, pick for example ModPerl::Util to
 # constrain the version.
