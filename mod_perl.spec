@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.10
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -316,6 +316,9 @@ fi
 
 
 %changelog
+* Fri May 31 2019 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.10-16
+- Perl 5.30 rebuild
+
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.10-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
