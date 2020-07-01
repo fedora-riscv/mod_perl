@@ -307,6 +307,7 @@ fi
 * Wed Jul 01 2020 Petr Pisar <ppisar@redhat.com> - 2.0.11-4
 - Enable tests
 - Do not use deprecated ap_get_server_version() (CPAN RT#124972)
+- Use httpd 2.4 access rules in an example in perl.conf
 
 * Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.11-3
 - Perl 5.32 rebuild
