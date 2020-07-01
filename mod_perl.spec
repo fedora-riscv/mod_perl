@@ -306,6 +306,7 @@ fi
 %changelog
 * Wed Jul 01 2020 Petr Pisar <ppisar@redhat.com> - 2.0.11-2
 - Do not use deprecated ap_get_server_version() (CPAN RT#124972)
+- Use httpd 2.4 access rules in an example in perl.conf
 
 * Mon Oct 07 2019 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.11-1
 - 2.0.11 bump
