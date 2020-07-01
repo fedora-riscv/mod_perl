@@ -183,9 +183,13 @@ rm -rf docs/os
 rm -rf Apache-Reload
 sed -i -e '/Apache-Reload/d' Makefile.PL MANIFEST
 %endif
-# Remove a failing test that's not a regression, CPAN RT#118919
-for F in t/filter/in_bbs_inject_header.t \
-        t/filter/TestFilter/in_bbs_inject_header.pm; do
+# Remove failing tests, CPAN RT#118919, CPAN RT#132919
+for F in \
+    ModPerl-Registry/t/closure.t \
+    ModPerl-Registry/t/special_blocks.t \
+    t/filter/in_bbs_inject_header.t \
+    t/filter/TestFilter/in_bbs_inject_header.pm \
+;do
     rm "$F"
     sed -i -e '\,^'"$F"',d' MANIFEST
 done
@@ -308,6 +312,8 @@ fi
 - Enable tests
 - Do not use deprecated ap_get_server_version() (CPAN RT#124972)
 - Use httpd 2.4 access rules in an example in perl.conf
+- Disable ModPerl-Registry/t/closure.t and ModPerl-Registry/t/special_blocks.t
+  tests (CPAN RT#132919)
 
 * Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.11-3
 - Perl 5.32 rebuild
