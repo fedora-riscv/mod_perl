@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -258,11 +258,11 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 
 %check
-#make test TEST_VERBOSE=1 && RETVAL=$?
-#if test "$RETVAL" != 0; then
-#    cat t/logs/error_log
-#    exit 1
-#fi
+make test TEST_VERBOSE=1 && RETVAL=$?
+if test "$RETVAL" != 0; then
+    cat t/logs/error_log
+    exit 1
+fi
 
 %files -f exclude.files
 %license LICENSE
@@ -301,6 +301,9 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 
 
 %changelog
+* Wed Jul 01 2020 Petr Pisar <ppisar@redhat.com> - 2.0.11-4
+- Enable tests
+
 * Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.11-3
 - Perl 5.32 rebuild
 - Disable tests
