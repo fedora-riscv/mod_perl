@@ -210,8 +210,8 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" perl Makefile.PL </dev/null \
 # This is not needed now when we are using httpd24 branch, but I will keep
 # it here in case someone will have to regenerate *.xs files again.
 %if %{regenerate_xs}0
-make source_scan
-make xs_generate
+%{make_build} source_scan
+%{make_build} xs_generate
 CFLAGS="$RPM_OPT_FLAGS -fpic" perl Makefile.PL </dev/null \
          PREFIX=$RPM_BUILD_ROOT/%{_prefix} \
          INSTALLDIRS=vendor \
@@ -219,11 +219,12 @@ CFLAGS="$RPM_OPT_FLAGS -fpic" perl Makefile.PL </dev/null \
          MP_APR_CONFIG=%{_bindir}/apr-1-config
 %endif
 
-make -C src/modules/perl %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS -fpic"
-make %{?_smp_mflags}
+%{make_build} -C src/modules/perl OPTIMIZE="$RPM_OPT_FLAGS -fpic"
+%{make_build}
 
 %install
 install -d -m 755 $RPM_BUILD_ROOT%{_httpd_moddir}
+# Not parallel-safe
 make install \
     MODPERL_AP_LIBEXECDIR=$RPM_BUILD_ROOT%{_httpd_moddir} \
     MODPERL_AP_INCLUDEDIR=$RPM_BUILD_ROOT%{_includedir}/httpd
