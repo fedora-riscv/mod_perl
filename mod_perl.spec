@@ -32,6 +32,8 @@ Patch1:         mod_perl-2.0.4-inline.patch
 Patch2:         mod_perl-2.0.11-Do-not-use-deprecated-ap_get_server_version-in-Serve.patch
 # Fix a crash due to wrong use of perl_parse(), in upstream after 2.0.11
 Patch3:         mod_perl-2.0.11-Fix_SIGSEGV_crash_due_to_wrong_use_of_perl_parse.patch
+# Fix building with perl 5.34, Perl GH#18617, in upstream after 2.0.11
+Patch4:         mod_perl-2.0.11-fix_building_with_perl-5.33.7.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
@@ -179,6 +181,7 @@ This mod_perl extension allows to reload Perl modules that changed on the disk.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p0
+%patch4 -p0
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove bundled Apache-Reload
@@ -313,6 +316,7 @@ fi
 %changelog
 * Mon May 17 2021 Petr Pisar <ppisar@redhat.com> - 2.0.11-7
 - Fix a crash due to wrong use of perl_parse()
+- Fix building with perl 5.34 (Perl GH#18617)
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.11-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
