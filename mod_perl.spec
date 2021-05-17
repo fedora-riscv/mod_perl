@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -30,6 +30,8 @@ Patch0:         mod_perl-2.0.10-Convert-documentation-to-UTF-8.patch
 Patch1:         mod_perl-2.0.4-inline.patch
 # Do not use deprecated ap_get_server_version(), CPAN RT#124972
 Patch2:         mod_perl-2.0.11-Do-not-use-deprecated-ap_get_server_version-in-Serve.patch
+# Fix a crash due to wrong use of perl_parse(), in upstream after 2.0.11
+Patch3:         mod_perl-2.0.11-Fix_SIGSEGV_crash_due_to_wrong_use_of_perl_parse.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
@@ -176,6 +178,7 @@ This mod_perl extension allows to reload Perl modules that changed on the disk.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p0
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove bundled Apache-Reload
@@ -308,6 +311,9 @@ fi
 
 
 %changelog
+* Mon May 17 2021 Petr Pisar <ppisar@redhat.com> - 2.0.11-3
+- Fix a crash due to wrong use of perl_parse()
+
 * Wed Jul 01 2020 Petr Pisar <ppisar@redhat.com> - 2.0.11-2
 - Do not use deprecated ap_get_server_version() (CPAN RT#124972)
 - Use httpd 2.4 access rules in an example in perl.conf
