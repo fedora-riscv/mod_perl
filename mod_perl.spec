@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.11
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -315,6 +315,9 @@ fi
 
 
 %changelog
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.11-8
+- Perl 5.34 rebuild
+
 * Mon May 17 2021 Petr Pisar <ppisar@redhat.com> - 2.0.11-7
 - Fix a crash due to wrong use of perl_parse()
 - Fix building with perl 5.34 (Perl GH#18617)
