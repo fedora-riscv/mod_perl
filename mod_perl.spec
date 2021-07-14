@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.11
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -34,6 +34,9 @@ Patch2:         mod_perl-2.0.11-Do-not-use-deprecated-ap_get_server_version-in-S
 Patch3:         mod_perl-2.0.11-Fix_SIGSEGV_crash_due_to_wrong_use_of_perl_parse.patch
 # Fix building with perl 5.34, Perl GH#18617, in upstream after 2.0.11
 Patch4:         mod_perl-2.0.11-fix_building_with_perl-5.33.7.patch
+# Fix detecting APR features broken by a multilib-sanitized apr.h,
+# bug #1981927, CPAN RT#137599, proposed to the upstream
+Patch5:         mod_perl-2.0.11-Parse-apr.h-with-a-C-preprocessor.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
@@ -182,6 +185,7 @@ This mod_perl extension allows to reload Perl modules that changed on the disk.
 %patch2 -p1
 %patch3 -p0
 %patch4 -p0
+%patch5 -p1
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove bundled Apache-Reload
@@ -315,6 +319,9 @@ fi
 
 
 %changelog
+* Wed Jul 14 2021 Petr Pisar <ppisar@redhat.com> - 2.0.11-9
+- Fix detecting APR features broken by a multilib-sanitized apr.h (bug #1981927)
+
 * Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.11-8
 - Perl 5.34 rebuild
 
