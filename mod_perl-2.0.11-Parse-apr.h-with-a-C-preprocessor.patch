@@ -1,0 +1,50 @@
+From 362cb5b39cd43ec0a43f9dd416771846c92dfccb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 14 Jul 2021 10:02:38 +0200
+Subject: [PATCH] Parse apr.h with a C preprocessor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+mod_perl's build script parses /usr/include/apr-1/apr.h for detecting
+APR_HAS_THREADS preprocessor symbol to decide whether APR library
+supports threads. Then APR::ThreadMutex module is built only if APR
+library was built with threads support.
+
+But /usr/include/apr-1/apr.h on some architectures (e.g. not on aarch64)
+is a wrapper for the real platform-specific header file. As a result
+mod_perl was erroneously built without APR::ThreadMutex module.
+
+This patch replaces opening that header file with executing
+a C preprocessor for the header file. That restores compatibility
+with the multilib-sanitized /usr/include/apr-1/apr.h header file (e.g.
+on x86_64).
+
+This patch uses safe more-than-3-list form of piped open(). This is
+not supported on Windows Perl < 5.022.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1981927
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/Apache2/Build.pm | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/Apache2/Build.pm b/lib/Apache2/Build.pm
+index 68ea07d..d09ce86 100644
+--- a/lib/Apache2/Build.pm
++++ b/lib/Apache2/Build.pm
+@@ -1494,8 +1494,9 @@ sub get_apr_config {
+     return $self->{apr_config} if $self->{apr_config};
+ 
+     my $header = catfile $self->apr_includedir, "apr.h";
+-    open my $fh, $header or do {
+-        error "Unable to open $header: $!";
++    my @command = ($self->perl_config('cpp'), '-dM', $header);
++    open my $fh, '-|', @command or do {
++        error "Unable to preprocess $header with @command: $!";
+         return undef;
+     };
+ 
+-- 
+2.31.1
+
