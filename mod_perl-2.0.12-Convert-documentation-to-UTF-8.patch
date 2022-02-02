@@ -1,4 +1,4 @@
-From 93ab44e687bd81a37e6e1fd285e0d47162e76c2d Mon Sep 17 00:00:00 2001
+From 297706c4728fd4008e9e1bc4846367f104c2dce5 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
 Date: Tue, 22 Nov 2016 16:42:26 +0100
 Subject: [PATCH] Convert documentation to UTF-8
@@ -8,44 +8,12 @@ Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Petr PÃ­saÅ™ <ppisar@redhat.com>
 ---
- Changes                       | 6 +++---
  SVN-MOVE                      | 2 +-
  docs/devel/core/explained.pod | 4 +++-
  docs/devel/debug/c.pod        | 4 +++-
  docs/user/Changes.pod         | 4 +++-
- 5 files changed, 13 insertions(+), 7 deletions(-)
+ 4 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/Changes b/Changes
-index 789c55b..145ed2f 100644
---- a/Changes
-+++ b/Changes
-@@ -701,7 +701,7 @@ improve the diagnostics when detecting mp2 < 1.999022, tell the user
- which files and/or dirs need to be removed [Stas]
- 
- restore the DESTDIR support partially nuked by the apache2 rename
--branch [Torsten Förtsch <torsten.foertsch gmx.net>]
-+branch [Torsten FÃ¶rtsch <torsten.foertsch gmx.net>]
- 
- add APR::Status to provide functions corresponding to the
- APR_STATUS_IS_* macros of apr_errno.h, especially those composites
-@@ -1113,7 +1113,7 @@ Fix Modperl::Util::unload_package() [Gozer]
-   - Leave entries from other packages alone
- 
- $filter->remove now works with native (non-modperl) filters + test
--[Torsten Förtsch <torsten.foertsch gmx.net>]
-+[Torsten FÃ¶rtsch <torsten.foertsch gmx.net>]
- 
- 
- 
-@@ -2135,7 +2135,7 @@ Make sure that the static mod_perl library is built after the dynamic
- 
- Apache::Status now generates HTML 4.01 Strict (and in many cases, also
- ISO-HTML) compliant output. Also add a simple CSS to make the reports
--look nicer. [Ville Skyttä <ville.skytta@iki.fi>]
-+look nicer. [Ville SkyttÃ¤ <ville.skytta@iki.fi>]
- 
- APR::Pool::DESTROY implemented and tweaked to only
- destroy pools created via APR::Pool->new() [Geoffrey Young]
 diff --git a/SVN-MOVE b/SVN-MOVE
 index e98bfc1..6bc42ac 100644
 --- a/SVN-MOVE
@@ -117,5 +85,5 @@ index f9ecb76..3582676 100644
  
  A new troubleshooting section on how to resolve "undefined symbol"
 -- 
-2.7.4
+2.34.1
 
