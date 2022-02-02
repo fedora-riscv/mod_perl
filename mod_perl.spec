@@ -13,36 +13,32 @@
 %global regenerate_xs 0
 
 Name:           mod_perl
-Version:        2.0.11
-Release:        10%{?dist}
+Version:        2.0.12
+Release:        1%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
 # docs/os/win32/distinstall:    GPL+ or Artistic
 # docs/os/win32/mpinstall:      GPL+ or Artistic
 License:        ASL 2.0
-URL:            http://perl.apache.org/
-Source0:        http://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz
-Source1:        perl.conf
-Source2:        perl.module.conf
+URL:            https://perl.apache.org/
+Source0:        https://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz
+Source1:        https://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz.asc
+Source2:        https://www.apache.org/dist/perl/KEYS
+Source3:        perl.conf
+Source4:        perl.module.conf
 # Normalize documentation encoding
-Patch0:         mod_perl-2.0.10-Convert-documentation-to-UTF-8.patch
+Patch0:         mod_perl-2.0.12-Convert-documentation-to-UTF-8.patch
 Patch1:         mod_perl-2.0.4-inline.patch
 # Do not use deprecated ap_get_server_version(), CPAN RT#124972
 Patch2:         mod_perl-2.0.11-Do-not-use-deprecated-ap_get_server_version-in-Serve.patch
-# Fix a crash due to wrong use of perl_parse(), in upstream after 2.0.11
-Patch3:         mod_perl-2.0.11-Fix_SIGSEGV_crash_due_to_wrong_use_of_perl_parse.patch
-# Fix building with perl 5.34, Perl GH#18617, in upstream after 2.0.11
-Patch4:         mod_perl-2.0.11-fix_building_with_perl-5.33.7.patch
-# Fix detecting APR features broken by a multilib-sanitized apr.h,
-# bug #1981927, CPAN RT#137599, proposed to the upstream
-Patch5:         mod_perl-2.0.11-Parse-apr.h-with-a-C-preprocessor.patch
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  gdbm-devel
+BuildRequires:  gnupg2
 BuildRequires:  httpd
 BuildRequires:  httpd-devel >= 2.4.0
 BuildRequires:  make
@@ -179,13 +175,11 @@ This mod_perl extension allows to reload Perl modules that changed on the disk.
 
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p0
-%patch4 -p0
-%patch5 -p1
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove bundled Apache-Reload
@@ -246,8 +240,8 @@ find $RPM_BUILD_ROOT -depth -type d -empty -delete
 # Install the config file
 install -d -m 755 $RPM_BUILD_ROOT%{_httpd_confdir}
 install -d -m 755 $RPM_BUILD_ROOT%{_httpd_modconfdir}
-install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_httpd_confdir}
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_httpd_modconfdir}/02-perl.conf
+install -p -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_httpd_confdir}
+install -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_httpd_modconfdir}/02-perl.conf
 
 # Move set of modules to -devel
 devmods="ModPerl::Code ModPerl::BuildMM ModPerl::CScan \
@@ -284,7 +278,7 @@ fi
 
 %files -f exclude.files
 %license LICENSE
-%doc Changes NOTICE README* STATUS SVN-MOVE docs/
+%doc Changes CONTRIBUTING.md NOTICE README* STATUS SVN-MOVE docs/
 %config(noreplace) %{_httpd_confdir}/perl.conf
 %config(noreplace) %{_httpd_modconfdir}/02-perl.conf
 %{_bindir}/*
@@ -319,6 +313,9 @@ fi
 
 
 %changelog
+* Wed Feb 02 2022 Petr Pisar <ppisar@redhat.com> - 2.0.12-1
+- 2.0.12 bump
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.11-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
