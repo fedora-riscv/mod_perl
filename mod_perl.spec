@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -272,7 +272,15 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 %check
 make test TEST_VERBOSE=1 && RETVAL=$?
 if test "$RETVAL" != 0; then
+    # Echo both error_log files if make test returns failure.
+    echo ***BEGIN t/logs/error_log***
     cat t/logs/error_log
+    echo ***END t/logs/error_log***
+
+    echo ***BEGIN ModPerl-Registry/t/logs/error_log***
+    cat ModPerl-Registry/t/logs/error_log
+    echo ***END ModPerl-Registry/t/logs/error_log***
+
     exit 1
 fi
 
@@ -313,6 +321,9 @@ fi
 
 
 %changelog
+* Sat Feb 12 2022 Andrew Bauer <zonexpertconsulting@outlook.com> - 2.0.12-2
+- Echo both error_log files in the event of a make test failure
+
 * Wed Feb 02 2022 Petr Pisar <ppisar@redhat.com> - 2.0.12-1
 - 2.0.12 bump
 
