@@ -273,13 +273,13 @@ find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 make test TEST_VERBOSE=1 && RETVAL=$?
 if test "$RETVAL" != 0; then
     # Echo both error_log files if make test returns failure.
-    echo ***BEGIN t/logs/error_log***
+    echo BEGIN t/logs/error_log
     cat t/logs/error_log
-    echo ***END t/logs/error_log***
+    echo END t/logs/error_log
 
-    echo ***BEGIN ModPerl-Registry/t/logs/error_log***
+    echo BEGIN ModPerl-Registry/t/logs/error_log
     cat ModPerl-Registry/t/logs/error_log
-    echo ***END ModPerl-Registry/t/logs/error_log***
+    echo END ModPerl-Registry/t/logs/error_log
 
     exit 1
 fi
