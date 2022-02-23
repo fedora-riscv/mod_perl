@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.12
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -22,16 +22,19 @@ Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # docs/os/win32/mpinstall:      GPL+ or Artistic
 License:        ASL 2.0
 URL:            https://perl.apache.org/
+
 Source0:        https://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz
 Source1:        https://www.apache.org/dist/perl/mod_perl-%{version}.tar.gz.asc
 Source2:        https://www.apache.org/dist/perl/KEYS
 Source3:        perl.conf
 Source4:        perl.module.conf
+
 # Normalize documentation encoding
 Patch0:         mod_perl-2.0.12-Convert-documentation-to-UTF-8.patch
 Patch1:         mod_perl-2.0.4-inline.patch
 # Do not use deprecated ap_get_server_version(), CPAN RT#124972
 Patch2:         mod_perl-2.0.11-Do-not-use-deprecated-ap_get_server_version-in-Serve.patch
+
 BuildRequires:  apr-devel >= 1.2.0
 BuildRequires:  apr-util-devel
 BuildRequires:  coreutils
@@ -109,6 +112,7 @@ BuildRequires:  perl(CGI) >= 2.93
 BuildRequires:  perl(HTTP::Request::Common)
 BuildRequires:  perl(LWP::UserAgent)
 %endif
+
 Requires:       httpd-mmn = %{_httpd_mmn}
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # For Apache::SizeLimit::Core
@@ -176,10 +180,8 @@ This mod_perl extension allows to reload Perl modules that changed on the disk.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%autosetup -p 1
+
 # Remove docs/os. It's only win32 info with non-ASL-2.0 license. Bug #1199044.
 rm -rf docs/os
 # Remove bundled Apache-Reload
@@ -191,6 +193,7 @@ sed -i -e '/Apache-Reload/d' Makefile.PL MANIFEST
 for F in \
     ModPerl-Registry/t/closure.t \
     ModPerl-Registry/t/special_blocks.t \
+    ModPerl-Registry/t/perlrun_extload.t \
     t/filter/in_bbs_inject_header.t \
     t/filter/TestFilter/in_bbs_inject_header.pm \
 ;do
@@ -321,6 +324,10 @@ fi
 
 
 %changelog
+* Wed Feb 23 2022 Andrew Bauer <zonexpertconsulting@outlook.com> - 2.0.12-3
+- remove perlrun_extload test
+- use autosetup macro
+
 * Sat Feb 12 2022 Andrew Bauer <zonexpertconsulting@outlook.com> - 2.0.12-2
 - Echo both error_log files in the event of a make test failure
 
