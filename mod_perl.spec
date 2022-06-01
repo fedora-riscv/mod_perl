@@ -14,7 +14,7 @@
 
 Name:           mod_perl
 Version:        2.0.12
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -324,6 +324,9 @@ fi
 
 
 %changelog
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.0.12-4
+- Perl 5.36 rebuild
+
 * Wed Feb 23 2022 Andrew Bauer <zonexpertconsulting@outlook.com> - 2.0.12-3
 - remove perlrun_extload test
 - use autosetup macro
