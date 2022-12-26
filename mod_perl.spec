@@ -3,6 +3,12 @@
 # Run optional test
 %{bcond_without mod_perl_enables_optional_test}
 
+%ifarch riscv64
+%{bcond_with tests}
+%else
+%{bcond_without tests}
+%endif
+
 %{!?_httpd_apxs:       %{expand: %%global _httpd_apxs       %%{_sbindir}/apxs}}
 %{!?_httpd_mmn:        %{expand: %%global _httpd_mmn        %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}}
 %{!?_httpd_confdir:    %{expand: %%global _httpd_confdir    %%{_sysconfdir}/httpd/conf.d}}
@@ -14,7 +20,7 @@
 
 Name:           mod_perl
 Version:        2.0.12
-Release:        5%{?dist}
+Release:        5.rv64%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -272,6 +278,7 @@ echo "%%exclude %{_mandir}/man3/Apache::Test*.3pm*" >> exclude.files
 # break provides so mod_perl requires mod_perl-devel. We remove them here.
 find "$RPM_BUILD_ROOT" -type f -name *.orig -delete
 
+%if %{with tests}
 %check
 make test TEST_VERBOSE=1 && RETVAL=$?
 if test "$RETVAL" != 0; then
@@ -286,6 +293,7 @@ if test "$RETVAL" != 0; then
 
     exit 1
 fi
+%endif
 
 %files -f exclude.files
 %license LICENSE
@@ -324,6 +332,9 @@ fi
 
 
 %changelog
+* Mon Dec 26 2022 Liu Yang <Yang.Liu.sn@gmail.com> - 2.0.12-5.rv64
+- Disable tests by default on riscv64.
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.12-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
